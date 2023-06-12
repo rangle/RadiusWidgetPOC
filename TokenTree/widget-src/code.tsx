@@ -31,21 +31,10 @@ function Widget() {
     figma.currentPage.selection.forEach((node) => {
       node.getSharedPluginDataKeys('tokens').forEach((key,i) => {
         if(key === 'hash') return;
-        const name = node.getSharedPluginData('tokens', key)
-        // render the tree
-        console.log('name',name,name === 'semanticTheme.color.actions.hover.foregroundOnNoBackground');
-        console.log('tokens',tokens)
-        console.log('token',tokens[name])
-        console.log('manual',tokens['semanticTheme.color.actions.hover.foregroundOnNoBackground'])
-        // iterate over the token values
-        
-        console.log('token',Object.keys(tokens).filter((token) => token.includes('semanticTheme')));
-        // const token = GetValueFromKey(name.split('.'),tokens)
-        // console.log('name',name)
-        // console.log('tokens' ,tokens);
-        // console.log('token',token);
-        // console.log(token)
-        // renderTree(token,node.x,node.y-20,node.parent);
+        if(key !== 'fill') return;
+        const name = node.getSharedPluginData('tokens', key).replaceAll('"','')
+        const token = tokens[name];
+        renderTree(token,node.x,node.y-20,node.parent);
       });
     });
 
