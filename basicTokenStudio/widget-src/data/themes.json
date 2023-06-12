@@ -1,0 +1,65 @@
+{
+  "global": [
+      {
+          "name": "black",
+          "value": "#000",
+          "type": "color"
+      },
+      {
+          "name": "white",
+          "value": "#FFF",
+          "type": "color"
+      },
+      {
+          "name": "grey-light",
+          "value": "#ccc",
+          "type": "color"
+      },
+      {
+          "name": "grey-dark",
+          "value": "#999",
+          "type": "color"
+      },
+      {
+          "name": "brand",
+          "value": "#f00",
+          "type": "color"
+      },
+      {
+          "name": "secondary",
+          "value": "#0f0",
+          "type": "color"
+      }
+  ],
+  "style-1": [
+      {
+          "name": "brand",
+          "value": "{white}",
+          "type": "color"
+      },
+      {
+          "name": "secondary",
+          "value": "{black}",
+          "type": "color"
+      }
+  ],
+  "style-2": [
+      {
+          "name": "brand",
+          "value": "{black}",
+          "type": "color"
+      },
+      {
+          "name": "secondary",
+          "value": "{white}",
+          "type": "color"
+      }
+  ],
+  "style-2-variant": [
+      {
+          "name": "brand",
+          "value": "{grey-dark}",
+          "type": "color"
+      }
+  ]
+}
