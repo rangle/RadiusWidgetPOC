@@ -79,10 +79,6 @@ function Widget() {
         return node.id === selection[0].id;
       });
 
-    // set the name of the selected element for use in the UI
-    // note: multiple selections are not supported yet
-    setSelectionName(selectedNodes[0].name);
-
     // get all the tokens that are used on the selected element and add them to
     // the tokenList array
     selectedNodes.forEach((node) => {
@@ -117,6 +113,9 @@ function Widget() {
           onClick={() => {
             const selection = figma.currentPage.selection;
             setSelection(selection);
+            // set the name of the selected element for use in the UI
+            // note: multiple selections are not supported yet
+            setSelectionName(selection[0].name);
             const tokenList = getSelectionTokens(selection);
             setTokenList(tokenList);
           }}
