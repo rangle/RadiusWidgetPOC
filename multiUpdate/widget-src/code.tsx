@@ -1,6 +1,5 @@
 const { widget } = figma;
-const { Frame, usePropertyMenu, useSyncedState, AutoLayout, SVG, Text } =
-  widget;
+const { usePropertyMenu, useSyncedState, AutoLayout, SVG, Text } = widget;
 
 type Token = [string, string];
 
@@ -125,17 +124,13 @@ function Widget() {
         </Text>
       </AutoLayout>
 
-      {/* temporarily rendering just the first 2 tokens for testing */}
-      {tokenList[0] && (
-        <Text fontSize={16} width="hug-contents">
-          {tokenList[0][0]}: {tokenList[0][1]}
-        </Text>
-      )}
-      {tokenList[1] && (
-        <Text fontSize={16} width="hug-contents">
-          {tokenList[1][0]}: {tokenList[1][1]}
-        </Text>
-      )}
+      {tokenList.map((token) => {
+        return (
+          <Text fontSize={16} width="hug-contents" key={token[0]}>
+            {token[0]}: {token[1]}
+          </Text>
+        );
+      })}
     </AutoLayout>
   );
 }
