@@ -1,0 +1,55 @@
+<button id="showToastButton">Say hello</button>
+<button id="getTokensButton">Get Tokens</button>
+<button id="closeButton">Close</button>
+
+<div id="container"></div>
+
+<script>
+  const showToastButton = document.getElementById("showToastButton");
+  showToastButton.onclick = () => {
+    parent.postMessage({ pluginMessage: { type: "showToast" } }, "*");
+  };
+
+  const closeButton = document.getElementById("closeButton");
+  closeButton.onclick = () => {
+    parent.postMessage({ pluginMessage: { type: "close" } }, "*");
+  };
+
+  const getTokensButton = document.getElementById("getTokensButton");
+  getTokensButton.onclick = () => {
+    parent.postMessage({ pluginMessage: { type: "getTokens" } }, "*");
+  };
+
+  onmessage = (event) => {
+    // Add tokens to the DOM
+    if (event.data.pluginMessage.type === 'tokens') {
+      const container = document.getElementById("container");
+
+      // Group data by 'node'
+      const groupedData = event.data.pluginMessage.tokens.reduce((groups, item) => {
+        const group = (groups[ item.node ] || []);
+        group.push(item);
+        groups[ item.node ] = group;
+        return groups;
+      }, {});
+
+      // Generate and inject HTML
+      Object.keys(groupedData).forEach((key) => {
+        const group = groupedData[ key ];
+
+        const nodeDiv = document.createElement('div');
+        nodeDiv.className = 'node-group';
+        nodeDiv.innerHTML = `<h2>${key}</h2>`; // Add 'node' as a heading
+
+        group.forEach((item) => {
+          const itemDiv = document.createElement('div');
+          itemDiv.className = 'node-item';
+          itemDiv.innerHTML = `<strong>${item.key}:</strong> ${item.value}`;
+          nodeDiv.appendChild(itemDiv);
+        });
+
+        container.appendChild(nodeDiv);
+      });
+    }
+  }
+</script>
