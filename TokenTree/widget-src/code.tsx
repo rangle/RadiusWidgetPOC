@@ -12,29 +12,28 @@ import { TokensAsObject } from './types/index'
 // }
 
 function Widget() {
-  const renderTree = (token:StudioToken,x:number,y:number,container:SceneNode) => {
-    figma.loadFontAsync({ family: "Inter", style: "Regular" }).then(() => {
-      const text = figma.createText()
-      text.characters = `${token.parent?'↳ ':''}${token.name}`
-      text.x = x
-      text.y = y
-      container.appendChild(text)
-      if(token.parent){
-        renderTree(token.parent,x,y-20,container);
-      }
-    })
+  const renderTree = async (token:StudioToken,x:number,y:number,container:SceneNode) => {
+    const text = figma.createText()
+    text.characters = `${token.parent?'↳ ':''}${token.name}`
+    text.x = x
+    text.y = y
+    container.appendChild(text)
+    if(token.parent){
+      await renderTree(token.parent,x,y-20,container);
+    }
   };
-  const generateTree = () => {
+  const generateTree = async () => {
+    await figma.loadFontAsync({ family: "Inter", style: "Regular" })
     const tokens = GetAllTokens();
     
     // get the select component
     figma.currentPage.selection.forEach((node) => {
-      node.getSharedPluginDataKeys('tokens').forEach((key,i) => {
+      node.getSharedPluginDataKeys('tokens').forEach(async (key,i) => {
         if(key === 'hash') return;
         if(key !== 'fill') return;
         const name = node.getSharedPluginData('tokens', key).replaceAll('"','')
         const token = tokens[name];
-        renderTree(token,node.x,node.y-20,node.parent);
+        await renderTree(token,node.x,node.y-20,node.parent);
       });
     });
 

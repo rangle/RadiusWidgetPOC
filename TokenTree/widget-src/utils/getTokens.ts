@@ -42,13 +42,15 @@ const findParentToken = (tokens:StudioToken[][]) => {
   // loop over the token sets
   for (let i = tokens.length - 1; i >= 0; i--) {
     const tokenSet = tokens[i];
+    
     // loop over the tokens
     for (let j = 0; j < tokenSet.length; j++) {
       const token = tokenSet[j];
+      
       if (typeof token.value !== 'string' || !token.value.includes("{")) continue;
       const parentName = (token.value.match(/\{(.*?)\}/)||[])[1];
+
       if (!parentName) continue;
-      
       token.parent = findTokenByName(parentName, tokens);
     }
   }
