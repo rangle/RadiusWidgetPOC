@@ -1,7 +1,7 @@
 // This widget will open an Iframe window with buttons to show a toast message and close the window.
 
 const { widget } = figma
-const {useSyncedState, useEffect, Text, AutoLayout } = widget
+const {useSyncedState, useEffect, Text, AutoLayout, Input } = widget
 
 
 const findGlobalComponent = async () => {
@@ -71,16 +71,16 @@ function Widget() {
 
   return (
     <AutoLayout
-      padding={16}
-      fill={'#c00'}
+      padding={8}
+      fill={'#0f0'}
       onClick={addComponent}
       // onClick={AddNewInstanceOfToken}
     >
       <Text
-        fontSize={24}
       >
-        Open IFrame
+        Create instance of '{componentName}'
       </Text>
+      
     </AutoLayout>
   )
 }
