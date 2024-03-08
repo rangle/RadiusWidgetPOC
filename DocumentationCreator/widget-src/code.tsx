@@ -1,5 +1,5 @@
 const { widget } = figma
-const { Frame } = widget
+const { Frame, AutoLayout, Text } = widget
 import { getTokenStudioTokens } from './token-stuido'
 import { getLocalVariable } from './local-variable'
 import { copyPasteThis, generateDefaultComponents, createDocumentationPage } from './rendering'
@@ -31,7 +31,25 @@ const createDocumentation = async () => {
 }
 
 function Widget() {
-  return <Frame width={100} height={100} fill={'#C4C4C4'} onClick={createDocumentation}></Frame>
+  return <AutoLayout
+    direction='vertical'
+    spacing={10}
+  >
+    <AutoLayout
+      onClick={createComponents}
+      padding={20}
+      fill={{ type: 'solid', color: '#fff' }}
+    >
+      <Text>Generate Default Documentation</Text>
+    </AutoLayout>
+    <AutoLayout
+      onClick={createDocumentation}
+      padding={20}
+      fill={{ type: 'solid', color: '#fff' }}
+    >
+      <Text>Create Documentation</Text>
+    </AutoLayout>
+  </AutoLayout>
 }
 
 widget.register(Widget)
