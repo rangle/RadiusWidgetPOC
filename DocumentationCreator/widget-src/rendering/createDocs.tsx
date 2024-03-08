@@ -1,4 +1,4 @@
-import { cloneTemplate } from './defaultComponents';
+import { cloneTemplate } from './utils';
 
 export async function createDocumentationPage() {
   // create the documentation frames
