@@ -1,26 +1,15 @@
 const { widget } = figma
-const { Frame, AutoLayout, Text } = widget
-import { getTokenStudioTokens } from './token-stuido'
-import { getLocalVariable } from './local-variable'
-import { copyPasteThis, generateDefaultComponents, createDocumentationPage } from './rendering'
+const { AutoLayout, Text } = widget
+import { getAllTokens } from './tokens'
+import { generateDefaultComponents, createDocumentationPage, createPropertiesGrid, createComponentTokens } from './rendering'
 
 // get the selected node from the figma API and return it
 const getSelectedNode = async () => {
   const selectedNode = figma.currentPage.selection[0];
   if (!selectedNode) return console.log('No node selected');
-
-  let tokens = getTokenStudioTokens(selectedNode)
-  const localVariables = await getLocalVariable(selectedNode)
-  tokens = tokens.concat(localVariables);
-
+  const tokens = getAllTokens(selectedNode);
   console.log('tokens', tokens);
 };
-
-const copyPaste = () => {
-  const selectedNode = figma.currentPage.selection[0];
-  if (!selectedNode) return console.log('No node selected');
-  copyPasteThis(selectedNode);
-}
 
 const createComponents = async () => {
   await generateDefaultComponents();
@@ -28,6 +17,18 @@ const createComponents = async () => {
 
 const createDocumentation = async () => {
   await createDocumentationPage();
+}
+
+const createGrid = async () => {
+  const selectedNode = figma.currentPage.selection[0];
+  if (!selectedNode) return figma.notify('No node selected');
+  await createPropertiesGrid(selectedNode)
+}
+
+const createTokens = async () => {
+  const selectedNode = figma.currentPage.selection[0];
+  if (!selectedNode) return figma.notify('No node selected');
+  createComponentTokens(selectedNode)
 }
 
 function Widget() {
@@ -48,6 +49,20 @@ function Widget() {
       fill={{ type: 'solid', color: '#fff' }}
     >
       <Text>Create Documentation</Text>
+    </AutoLayout>
+    <AutoLayout
+      onClick={createGrid}
+      padding={20}
+      fill={{ type: 'solid', color: '#fff' }}
+    >
+      <Text>Create Grid</Text>
+    </AutoLayout>
+    <AutoLayout
+      onClick={createTokens}
+      padding={20}
+      fill={{ type: 'solid', color: '#fff' }}
+    >
+      <Text>Create Tokens</Text>
     </AutoLayout>
   </AutoLayout>
 }

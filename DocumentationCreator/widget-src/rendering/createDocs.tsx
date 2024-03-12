@@ -12,13 +12,21 @@ export async function createDocumentationPage() {
   // Token Branch
   // Accessibility
   // Component Properties
-  cloneTemplate('.template.frame', 'dev-handoff', { x: 0, y: 0, width: 550, height: 500 }, {
+  let xLocation = 0;
+  const spacing = 20;
+  cloneTemplate('.template.frame', 'dev-handoff', { x: xLocation, y: 0, width: 550, height: 500 }, {
     '.frame.title.text': 'Dev Hands off Specification',
   })
-  cloneTemplate('.template.frame', 'anatomy', { x: 566, y: 0, width: 550, height: 500 }, {
+  xLocation += 550 + spacing;
+  cloneTemplate('.template.frame', 'anatomy', { x: xLocation, y: 0, width: 550, height: 500 }, {
     '.frame.title.text': 'Anatomy',
   })
-  cloneTemplate('.template.frame', 'variants-props', { x: 1132, y: 0, width: 550, height: 500 }, {
+  xLocation += 550 + spacing;
+  cloneTemplate('.template.frame', 'variants-props', { x: xLocation, y: 0, width: 550, height: 500 }, {
     '.frame.title.text': 'Variants & Props',
+  })
+  xLocation += 550 + spacing;
+  cloneTemplate('.template.frame', 'states', { x: xLocation, y: 0, width: 550, height: 500 }, {
+    '.frame.title.text': 'States',
   })
 }

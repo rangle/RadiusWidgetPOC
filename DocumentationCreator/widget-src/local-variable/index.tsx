@@ -1,1 +1,0 @@
-export { getLocalVariable } from './local-variable';

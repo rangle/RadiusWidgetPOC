@@ -26,7 +26,6 @@ export async function cloneTemplate(referenceTemplate: string, name: string, siz
     newValue[instanceTextName] = texts[node.name]
     instance.setProperties(newValue)
   })
-
 }
 
 export async function getTemplate(name: string) {

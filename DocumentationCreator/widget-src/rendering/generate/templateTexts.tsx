@@ -36,7 +36,7 @@ export async function generateTemplateTexts(x: number) {
   // setup the component
   const newComponent = figma.combineAsVariants([titleTextComponent, bodyTextComponent], figma.currentPage)//figma.createComponentFromNode(bodyText)
   newComponent.name = '.template.texts'
-  newComponent.x = x + 10
+  newComponent.x = x
   newComponent.editComponentProperty('Property 1', { name: 'style' })
   newComponent.fills = [{ type: 'SOLID', color: { r: 0.5, g: 0.5, b: 0.5 } }]
 
