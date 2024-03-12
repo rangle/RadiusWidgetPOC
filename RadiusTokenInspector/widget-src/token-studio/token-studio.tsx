@@ -1,7 +1,4 @@
-import {
-
-  isComposite,
-} from "../common/figma.types";
+import { isComposite } from "../common/figma.types";
 import { ComponentUsage, TokenUse } from "../common/token.types";
 
 export function getTokenStudioTokens(node: SceneNode): ComponentUsage {
@@ -17,13 +14,16 @@ export function getTokenStudioTokens(node: SceneNode): ComponentUsage {
           ...tokens,
           {
             name: token,
-            value: node.getSharedPluginData("tokens", token),
-            from: "Token Studio",
-          },
+            value: node
+              .getSharedPluginData("tokens", token)
+              .replace(/^["](.*)["]$/, "$1"),
+            from: "token studio",
+          } satisfies TokenUse,
         ];
   }, [] as TokenUse[]);
 
   return {
+    id: node.id,
     name: node.name,
     props: props.flatMap((v) => v),
     children,

@@ -15,6 +15,7 @@ export async function getLocalVariables(
   if (!variables) {
     console.log("no boundVariables: returning empty");
     return {
+      id: node.id,
       name: node.name,
       props: [],
       children: [],
@@ -48,7 +49,7 @@ export async function getLocalVariables(
                   ? ({
                       name: key,
                       value: value.name,
-                      from: "Local Variable",
+                      from: "variable",
                     } satisfies TokenUse)
                   : undefined;
               }
@@ -65,7 +66,7 @@ export async function getLocalVariables(
                 {
                   name: key,
                   value: value.name,
-                  from: "Local Variable",
+                  from: "variable",
                 },
               ] satisfies TokenUse[])
             : ([] satisfies TokenUse[]);
@@ -77,6 +78,7 @@ export async function getLocalVariables(
   );
 
   return {
+    id: node.id,
     name: node.name,
     props: props.flatMap((v) => v),
     children: await Promise.all(children),
