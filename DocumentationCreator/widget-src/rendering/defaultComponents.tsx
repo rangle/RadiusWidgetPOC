@@ -1,5 +1,6 @@
 import { generateTemplateFrame } from './generate/templateFrame';
 import { generateTemplateTexts } from './generate/templateTexts';
+import { generateTemplateToken } from './generate/templateToken';
 
 export async function generateDefaultComponents() {
   // load fonts
@@ -9,7 +10,7 @@ export async function generateDefaultComponents() {
   // create a new frame
   await generateTemplateTexts(650);
   const newFrame = await generateTemplateFrame('Example Frame', 550, 1000, 0, 0);
-
+  await generateTemplateToken(1000);
   if (!newFrame) return
 
   // focus on the new frame
