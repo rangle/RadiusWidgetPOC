@@ -1,10 +1,10 @@
 const { widget } = figma
 const { Text } = widget
 
-import { getTemplate } from '../utils';
+import { getComponent } from '../utils';
 
 export async function generateTemplateTexts(x: number) {
-  const frameExists = await getTemplate('.template.texts')
+  const frameExists = await getComponent('style=.template.text.body')
 
   if (frameExists) {
     figma.notify('Example text (named `.template.texts`) already exists, the default text will not be created.')
@@ -29,14 +29,24 @@ export async function generateTemplateTexts(x: number) {
     fill={{ type: 'solid', color: "#fff" }}
     width={'fill-parent'}
     height={'hug-contents'}
-    y={32}
   >Title Text</Text>) as TextNode;
   const titleTextComponent = figma.createComponentFromNode(titleText);
 
+  const componentTitle = await figma.createNodeFromJSXAsync(<Text
+    name={'.template.text.componentTitle'}
+    fontSize={20}
+    font={{ family: 'Roboto Mono', style: 'Regular' }}
+    fill={{ type: 'solid', color: "#000" }}
+    width={'fill-parent'}
+    height={'hug-contents'}
+  >Component Title</Text>) as TextNode;
+  const componentTitleComponent = figma.createComponentFromNode(componentTitle);
+
   // setup the component
-  const newComponent = figma.combineAsVariants([titleTextComponent, bodyTextComponent], figma.currentPage)//figma.createComponentFromNode(bodyText)
+  const newComponent = figma.combineAsVariants([titleTextComponent, bodyTextComponent, componentTitleComponent], figma.currentPage)//figma.createComponentFromNode(bodyText)
   newComponent.name = '.template.texts'
   newComponent.x = x
+  newComponent.layoutMode = 'VERTICAL'
   newComponent.editComponentProperty('Property 1', { name: 'style' })
   newComponent.fills = [{ type: 'SOLID', color: { r: 0.5, g: 0.5, b: 0.5 } }]
 
@@ -50,6 +60,13 @@ export async function generateTemplateTexts(x: number) {
   titleText.componentPropertyReferences = {
     characters: textVariableName
   }
+  componentTitle.componentPropertyReferences = {
+    characters: textVariableName
+  }
+
+  bodyTextComponent.layoutAlign = 'STRETCH'
+  titleTextComponent.layoutAlign = 'STRETCH'
+  componentTitleComponent.layoutAlign = 'STRETCH'
 
   return newComponent;
 }

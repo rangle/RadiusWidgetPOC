@@ -1,5 +1,6 @@
 import { getAllTokensRecursive } from "../tokens";
 import type { ComponentUsage } from "../common/token.types";
+import { getComponent, setComponentTexts } from "./utils";
 
 const { widget } = figma
 const { AutoLayout, Text } = widget
@@ -50,10 +51,56 @@ export const createComponentTokens = async (selectedComponent: SceneNode) => {
   const tokens = await getAllTokensRecursive(selectedComponent);
   const flattenedTokens = flattenTokens(tokens);
 
-  await figma.createNodeFromJSXAsync(<AutoLayout
-    name={'.component.tokens'}
-    width={200}
-    direction="vertical"
-    spacing={8}
-  >{flattenedTokens.map(componentTokens)}</AutoLayout>);
+  const localVariable = await getComponent('type=.template.localVariableIcon');
+  const tokenStudio = await getComponent('type=.template.tokenStudioIcon');
+  const componentTitleComponent = await getComponent('style=.template.text.componentTitle');
+  if (!localVariable || !tokenStudio || !componentTitleComponent) {
+    figma.notify('Example token (named `.template.token`) does not exist.')
+    return
+  }
+
+  const tokenContainer = await figma.createNodeFromJSXAsync(
+    <AutoLayout
+      name={selectedComponent.name + ' tokens'}
+      width={200}
+      direction="vertical"
+      spacing={8}
+    ></AutoLayout>
+  ) as FrameNode;
+
+  const tokenListTemplate = await figma.createNodeFromJSXAsync(
+    <AutoLayout
+      name='tokenList'
+      width='fill-parent'
+      direction="vertical"
+      spacing={8}
+    ></AutoLayout>);
+
+  for (let i = 0; i < flattenedTokens.length; i++) {
+    const tokenList = await tokenListTemplate.clone() as FrameNode;
+    tokenList.name = flattenedTokens[i].name;
+    const name = componentTitleComponent.createInstance();
+    setComponentTexts(name, { '.template.text.componentTitle': flattenedTokens[i].name });
+    tokenList.appendChild(name);
+
+    for (let j = 0; j < flattenedTokens[i].props.length; j++) {
+      const token = flattenedTokens[i].props[j];
+      const tokenInstance = token.from === 'Token Studio' ? await tokenStudio.createInstance() : await localVariable.createInstance();
+      tokenInstance.name = token.name;
+      setComponentTexts(tokenInstance, { '.template.tokenName': token.name, '.template.tokenValue': token.value });
+      tokenList.appendChild(tokenInstance);
+    }
+    tokenContainer.appendChild(tokenList);
+    tokenList.layoutSizingHorizontal = "HUG";
+    tokenList.layoutSizingVertical = 'HUG';
+  }
+  tokenContainer.layoutMode = 'VERTICAL';
+  tokenContainer.layoutSizingHorizontal = "HUG";
+  tokenContainer.layoutSizingVertical = 'HUG';
+
+  // remove token list
+  tokenListTemplate.remove();
+
+  return tokenContainer;
+
 };
