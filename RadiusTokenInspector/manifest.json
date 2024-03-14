@@ -1,19 +1,15 @@
 {
-  "name": "Document",
+  "name": "Radius Token Inspector",
   "id": "1346568609003392004",
   "api": "1.0.0",
   "main": "dist/code.js",
   "capabilities": [],
   "enableProposedApi": false,
-  "editorType": [
-    "figma"
-  ],
+  "editorType": ["figma"],
   "containsWidget": true,
   "widgetApi": "1.0.0",
   "networkAccess": {
-    "allowedDomains": [
-      "none"
-    ]
+    "allowedDomains": ["none"]
   },
   "documentAccess": "dynamic-page"
 }

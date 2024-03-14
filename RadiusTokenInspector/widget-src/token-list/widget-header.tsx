@@ -1,14 +1,24 @@
+import { ComponentUsage } from "../common/token.types";
+import { Button } from "./button";
+import { Icon16px } from "./icon";
+
 const { widget } = figma;
 const { Text, AutoLayout } = widget;
 
 export type WidgetHeaderProps = {
-  inspect: () => void;
+  node: ComponentUsage | undefined;
+  addComponent: () => void;
+  resetComponents: () => void;
 };
 
-export const WidgetHeader = ({ inspect }: WidgetHeaderProps) => {
+export const WidgetHeader = ({
+  node,
+  addComponent,
+  resetComponents,
+}: WidgetHeaderProps) => {
   return (
     <AutoLayout
-      name="Widget Header"
+      name="Widget-Header"
       overflow="visible"
       spacing="auto"
       padding={{
@@ -17,40 +27,97 @@ export const WidgetHeader = ({ inspect }: WidgetHeaderProps) => {
       }}
       width="fill-parent"
     >
-      <AutoLayout
-        name="Widget-title"
-        direction="vertical"
-        spacing={6}
-        verticalAlignItems="center"
-      >
+      <AutoLayout name="Widget-title" spacing={6} verticalAlignItems="center">
+        <Icon16px icon="figma" />
         <Text
           name="Radius Token Inspector"
           fill="#030303"
-          fontFamily="Roboto Mono"
-          fontSize={14}
+          fontFamily="Roboto Condensed"
           fontWeight={700}
         >
           Radius Token Inspector
         </Text>
       </AutoLayout>
-      <AutoLayout
-        name="Widget-link"
-        direction="vertical"
-        spacing={6}
-        verticalAlignItems="center"
-      >
-        <Text
-          name="select"
-          fill="#117DF9"
-          horizontalAlignText="right"
-          fontFamily="Roboto Mono"
-          fontSize={12}
-          fontWeight={700}
-          onClick={() => inspect()}
+      {node ? (
+        <>
+          <AutoLayout
+            name="button"
+            fill={{
+              opacity: 0,
+              type: "solid",
+              color: {
+                r: 0,
+                g: 0,
+                b: 0,
+                a: 1,
+              },
+            }}
+            stroke="#262626"
+            overflow="visible"
+            padding={{
+              vertical: 4,
+              horizontal: 6,
+            }}
+            horizontalAlignItems="center"
+            verticalAlignItems="center"
+          >
+            <Button icon="refresh" onClick={() => addComponent()}>
+              Replace Component
+            </Button>
+          </AutoLayout>
+          <AutoLayout
+            name="button"
+            fill={{
+              opacity: 0,
+              type: "solid",
+              color: {
+                r: 0,
+                g: 0,
+                b: 0,
+                a: 1,
+              },
+            }}
+            stroke="#262626"
+            overflow="visible"
+            padding={{
+              vertical: 4,
+              horizontal: 6,
+            }}
+            horizontalAlignItems="center"
+            verticalAlignItems="center"
+          >
+            <Button icon="close" onClick={() => resetComponents()}>
+              Reset
+            </Button>
+          </AutoLayout>
+        </>
+      ) : (
+        <AutoLayout
+          name="button"
+          fill={{
+            opacity: 0,
+            type: "solid",
+            color: {
+              r: 0,
+              g: 0,
+              b: 0,
+              a: 1,
+            },
+          }}
+          stroke="#262626"
+          overflow="visible"
+          padding={{
+            vertical: 4,
+            horizontal: 6,
+          }}
+          horizontalAlignItems="center"
+          verticalAlignItems="center"
         >
-          inspect selection
-        </Text>
-      </AutoLayout>
+          <Button icon="add-box" onClick={() => addComponent()}>
+            Add Component
+          </Button>
+        </AutoLayout>
+      )}
     </AutoLayout>
   );
 };

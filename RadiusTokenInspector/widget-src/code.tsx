@@ -12,6 +12,7 @@ const combineComponentUsage = (
   b: ComponentUsage
 ): ComponentUsage => {
   return {
+    id: a.id,
     name: a.name,
     props: [...a.props, ...b.props],
     children: a.children.map((ac, index) =>
@@ -37,13 +38,22 @@ export const getSelectedNode = async () => {
 
   return node;
 };
+
+type NodeTokensProps = {
+  usage: ComponentUsage | undefined;
+  inspect: () => void;
+  isDeleted: (id: string) => boolean;
+  resetComponents: () => void;
+  deleteComponent: (id: string) => void;
+};
+
 export const NodeTokens = ({
   usage,
   inspect,
-}: {
-  usage: ComponentUsage | undefined;
-  inspect: () => void;
-}) => {
+  isDeleted,
+  deleteComponent,
+  resetComponents,
+}: NodeTokensProps) => {
   return (
     <AutoLayout
       name="WidgetFrame"
@@ -64,8 +74,16 @@ export const NodeTokens = ({
       spacing={6}
       padding={12}
     >
-      <WidgetHeader inspect={inspect} />
-      <ComponentDocs usage={usage} />
+      <WidgetHeader
+        node={usage}
+        addComponent={inspect}
+        resetComponents={() => resetComponents()}
+      />
+      <ComponentDocs
+        usage={usage}
+        deleteComponent={deleteComponent}
+        isDeleted={isDeleted}
+      />
     </AutoLayout>
   );
 };
@@ -75,11 +93,20 @@ export function Widget() {
     "nodes",
     undefined
   );
+  const [deleted, setDeleted] = useSyncedState<string[]>("deletedNodes", []);
   return (
     <NodeTokens
       usage={node}
       inspect={() => {
         getSelectedNode().then((node) => setNode(node));
+      }}
+      isDeleted={(id: string) => deleted.indexOf(id) !== -1}
+      deleteComponent={(id: string) => {
+        if (deleted.indexOf(id) === -1) setDeleted([...deleted, id]);
+      }}
+      resetComponents={() => {
+        setNode(undefined);
+        setDeleted([]);
       }}
     />
   );
