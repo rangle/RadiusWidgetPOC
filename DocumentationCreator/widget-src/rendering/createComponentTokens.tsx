@@ -9,6 +9,7 @@ const flattenTokens = (tokens: ComponentUsage): ComponentUsage[] => {
   const flattenedTokens = [tokens];
   for (let i = 0; i < tokens.children.length; i++) {
     const child = tokens.children[i];
+    if (child.props.length === 0) continue;
     flattenedTokens.push(...flattenTokens(child));
   }
   return flattenedTokens;
@@ -69,7 +70,7 @@ export const createComponentTokens = async (selectedComponent: SceneNode) => {
     const tokenList = await tokenListTemplate.clone() as FrameNode;
     tokenList.name = flattenedTokens[i].name;
     const name = componentTitleComponent.createInstance();
-    setComponentTexts(name, { '.template.text.componentTitle': flattenedTokens[i].name });
+    setComponentTexts(name, { '.template.texts': flattenedTokens[i].name });
     tokenList.appendChild(name);
 
     for (let j = 0; j < flattenedTokens[i].props.length; j++) {

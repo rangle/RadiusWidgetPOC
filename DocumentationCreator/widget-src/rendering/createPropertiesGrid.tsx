@@ -66,10 +66,9 @@ export const createPropertiesGrid = async (selectedComponent: SceneNode) => {
 
   const title = titleComponent.createInstance();
   title.name = 'gridTitle'
-  console.log('maxOption', maxOption[0])
   setComponentTexts(title, { 'gridTitle': maxOption[0] });
   optionsFrame.appendChild(title)
-
+  console.log(componentOptions)
 
   // create an instance for each of the maxOptions
   maxOption[1].variantOptions?.forEach((option) => {
@@ -86,20 +85,48 @@ export const createPropertiesGrid = async (selectedComponent: SceneNode) => {
   // for each entry in the componentOptions, create a new instance and set the properties
   Object.entries(componentOptions).forEach(([key, value]) => {
     if (key === maxOption[0]) return
+    if (value.type === 'BOOLEAN') {
+      const currentOptionFrame = optionsFrame.clone();
+      const name = key + ': ' + !value.defaultValue
+      currentOptionFrame.name = name;
+      setComponentTexts(currentOptionFrame, { 'gridTitle': name });
+      currentOptionFrame.children.forEach(async (child) => {
+        if (!isInstance(child)) return
+        if (child.name === 'gridTitle') {
+          await setComponentTexts(child, { '.template.text.gridTitle': key });
+          return
+        }
+        if (Object.keys(child.componentProperties).includes(key)) {
+          child.setProperties({ [key]: !value.defaultValue })
+        } else {
+          child.remove();
+        }
+      });
+      gridFrame.appendChild(currentOptionFrame)
+
+      return;
+    }
     value.variantOptions?.forEach((option) => {
       const currentOptionFrame = optionsFrame.clone();
       const name = key + ': ' + option
       currentOptionFrame.name = name;
       setComponentTexts(currentOptionFrame, { 'gridTitle': name });
-      currentOptionFrame.children.forEach((child) => {
+
+      // for each instance, we set it to it's new state
+      currentOptionFrame.children.forEach(async (child) => {
         if (!isInstance(child)) return
         // if it's the title
         if (child.name === 'gridTitle') {
-          setComponentTexts(child, { '.template.text.gridTitle': key });
+          await setComponentTexts(child, { '.template.text.gridTitle': key });
           return
         }
         // if it's a component
-        child.setProperties({ [key]: option })
+        if (Object.keys(child.componentProperties).includes(key)) {
+          child.setProperties({ [key]: option })
+        } else {
+          child.remove();
+        }
+
       });
       gridFrame.appendChild(currentOptionFrame)
     });
