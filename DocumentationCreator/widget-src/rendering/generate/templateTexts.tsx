@@ -42,8 +42,46 @@ export async function generateTemplateTexts(x: number) {
   >Component Title</Text>) as TextNode;
   const componentTitleComponent = figma.createComponentFromNode(componentTitle);
 
+  const gridTitle = await figma.createNodeFromJSXAsync(<Text
+    name={'.template.text.gridTitle'}
+    fontSize={12}
+    font={{ family: 'Roboto Mono', style: 'Regular' }}
+    fill={{ type: 'solid', color: "#000" }}
+    width={'fill-parent'}
+    height={'hug-contents'}
+  >Grid Title</Text>) as TextNode;
+  const gridTitleComponent = figma.createComponentFromNode(gridTitle);
+
+  const checkBoxTitle = await figma.createNodeFromJSXAsync(<Text
+    name={'.template.text.checkBoxTitle'}
+    fontSize={12}
+    font={{ family: 'Roboto Mono', style: 'Regular' }}
+    fill={{ type: 'solid', color: "#000" }}
+    width={'fill-parent'}
+    height={'hug-contents'}
+  >Checkbox Title</Text>) as TextNode;
+  const checkBoxTitleComponent = figma.createComponentFromNode(checkBoxTitle);
+
+  const checkBoxBody = await figma.createNodeFromJSXAsync(<Text
+    name={'.template.text.checkBoxBody'}
+    fontSize={12}
+    font={{ family: 'Roboto Mono', style: 'Regular' }}
+    fill={{ type: 'solid', color: "#000" }}
+    width={'fill-parent'}
+    height={'hug-contents'}
+  >Checkbox Body</Text>) as TextNode;
+  const checkBoxBodyComponent = figma.createComponentFromNode(checkBoxBody);
+
   // setup the component
-  const newComponent = figma.combineAsVariants([titleTextComponent, bodyTextComponent, componentTitleComponent], figma.currentPage)//figma.createComponentFromNode(bodyText)
+  const newComponent = figma.combineAsVariants([
+    titleTextComponent,
+    bodyTextComponent,
+    componentTitleComponent,
+    gridTitleComponent,
+    checkBoxTitleComponent,
+    checkBoxBodyComponent],
+    figma.currentPage
+  )
   newComponent.name = '.template.texts'
   newComponent.x = x
   newComponent.layoutMode = 'VERTICAL'
@@ -63,10 +101,22 @@ export async function generateTemplateTexts(x: number) {
   componentTitle.componentPropertyReferences = {
     characters: textVariableName
   }
+  gridTitle.componentPropertyReferences = {
+    characters: textVariableName
+  }
+  checkBoxTitle.componentPropertyReferences = {
+    characters: textVariableName
+  }
+  checkBoxBody.componentPropertyReferences = {
+    characters: textVariableName
+  }
 
   bodyTextComponent.layoutAlign = 'STRETCH'
   titleTextComponent.layoutAlign = 'STRETCH'
   componentTitleComponent.layoutAlign = 'STRETCH'
+  gridTitleComponent.layoutAlign = 'STRETCH'
+  checkBoxTitleComponent.layoutAlign = 'STRETCH'
+  checkBoxBodyComponent.layoutAlign = 'STRETCH'
 
   return newComponent;
 }

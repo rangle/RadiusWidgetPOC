@@ -31,12 +31,13 @@ export async function generateTemplateFrame(name: string, width: number, height:
 
   </AutoLayout>) as FrameNode;
 
-  const contentFrame = await figma.createNodeFromJSXAsync(<Frame
+  const contentFrame = await figma.createNodeFromJSXAsync(<AutoLayout
     name='.frame.content'
-    width={'fill-parent'}
-    height={'fill-parent'}
+    direction='vertical'
+    width={'hug-contents'}
+    height={'hug-contents'}
   >
-  </Frame>) as FrameNode;
+  </AutoLayout>) as FrameNode;
 
   const titleWrapper = await figma.createNodeFromJSXAsync(
     <AutoLayout
@@ -67,8 +68,10 @@ export async function generateTemplateFrame(name: string, width: number, height:
   frame.appendChild(contentFrame);
 
   titleInstance.layoutSizingHorizontal = 'FILL';
-  contentFrame.layoutSizingHorizontal = 'FILL';
-  contentFrame.layoutSizingVertical = 'FILL';
+  contentFrame.layoutSizingHorizontal = 'HUG';
+  contentFrame.layoutSizingVertical = 'HUG';
+  frame.layoutSizingVertical = 'HUG';
+  frame.layoutSizingHorizontal = 'HUG';
 
   return frame
 }

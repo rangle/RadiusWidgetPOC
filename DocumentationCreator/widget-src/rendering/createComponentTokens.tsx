@@ -33,17 +33,6 @@ const tokenText = (value: ComponentUsage['props'][0]) => {
   </AutoLayout>
 }
 
-const componentTokens = (tokens: ComponentUsage) => {
-  return <AutoLayout
-    name={tokens.name}
-    width='fill-parent'
-    direction="vertical"
-    spacing={8}
-  >
-    {tokens.props.map(tokenText)}
-  </AutoLayout>
-}
-
 // this component will generate a component with all the tokens assiciated with a component
 // it will go through each child of the component looking for tokens
 export const createComponentTokens = async (selectedComponent: SceneNode) => {

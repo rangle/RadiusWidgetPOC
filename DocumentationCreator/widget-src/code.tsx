@@ -1,6 +1,6 @@
 const { widget } = figma
 const { AutoLayout, Text } = widget
-import { getAllTokens } from './tokens'
+import { getAllTokens, getAllLocalVariableTokens } from './tokens'
 import { generateDefaultComponents, createDocumentationPage, createPropertiesGrid, createComponentTokens } from './rendering'
 
 // get the selected node from the figma API and return it
@@ -16,7 +16,8 @@ const createComponents = async () => {
 }
 
 const createDocumentation = async () => {
-  await createDocumentationPage();
+  const selectedNode = figma.currentPage.selection[0];
+  await createDocumentationPage(selectedNode);
 }
 
 const createGrid = async () => {
@@ -28,7 +29,11 @@ const createGrid = async () => {
 const createTokens = async () => {
   const selectedNode = figma.currentPage.selection[0];
   if (!selectedNode) return figma.notify('No node selected');
-  createComponentTokens(selectedNode)
+  await createComponentTokens(selectedNode)
+}
+
+const clickGetTokens = async () => {
+  console.log(await getAllLocalVariableTokens());
 }
 
 function Widget() {
@@ -63,6 +68,13 @@ function Widget() {
       fill={{ type: 'solid', color: '#fff' }}
     >
       <Text>Create Tokens</Text>
+    </AutoLayout>
+    <AutoLayout
+      onClick={clickGetTokens}
+      padding={20}
+      fill={{ type: 'solid', color: '#fff' }}
+    >
+      <Text>Get Tokens</Text>
     </AutoLayout>
   </AutoLayout>
 }
