@@ -28,7 +28,7 @@ export const WidgetHeader = ({
       width="fill-parent"
     >
       <AutoLayout name="Widget-title" spacing={6} verticalAlignItems="center">
-        <Icon16px icon="figma" />
+        <Icon16px icon="radius" />
         <Text
           name="Radius Token Inspector"
           fill="#030303"

@@ -12,7 +12,8 @@ type IconType =
   | "tokens"
   | "component"
   | "instance"
-  | "refresh";
+  | "refresh"
+  | "radius";
 
 const iconSrc: Record<IconType, string> = {
   "add-box": `<svg width='12' height='12' viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'>
@@ -66,6 +67,12 @@ const iconSrc: Record<IconType, string> = {
   refresh: `<svg width='11' height='16' viewBox='0 0 11 16' fill='none' xmlns='http://www.w3.org/2000/svg'>
 <path fill-rule='evenodd' clip-rule='evenodd' d='M5.68 0.666687V2.66669C8.5088 2.66669 10.8 5.05335 10.8 8.00002C10.8 9.04669 10.5056 10.02 10.0064 10.84L9.072 9.86669C9.36 9.31335 9.52 8.67335 9.52 8.00002C9.52 5.79335 7.7984 4.00002 5.68 4.00002V6.00002L3.12 3.33335L5.68 0.666687ZM1.84 8.00002C1.84 10.2067 3.5616 12 5.68 12V10L8.24 12.6667L5.68 15.3334V13.3334C2.8512 13.3334 0.559998 10.9467 0.559998 8.00002C0.559998 6.95335 0.854398 5.98002 1.3536 5.16002L2.288 6.13335C2 6.68669 1.84 7.32669 1.84 8.00002Z' fill='#262626'/>
 </svg>`,
+  radius: `
+<svg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
+<path d='M9 8.99998L21 21' stroke='#D44527' stroke-width='2' stroke-miterlimit='10'/>
+<path d='M6.44444 21.9043H2C2.01369 16.6042 4.12522 11.525 7.87298 7.77728C11.6207 4.02952 16.6999 1.91798 22 1.9043V6.38579C17.8808 6.38578 13.9298 8.01957 11.0136 10.9288C8.09748 13.838 6.45425 17.7851 6.44444 21.9043Z' fill='#262626'/>
+</svg>
+`,
 };
 
 export type IconProps = Partial<FrameProps> & {

@@ -1,11 +1,13 @@
-export const isFrame = (n: SceneNode): n is FrameNode => n.type === "FRAME";
-export const isInstance = (n: SceneNode): n is InstanceNode =>
-  n.type === "INSTANCE";
-export const isComponent = (n: SceneNode): n is ComponentNode =>
-  n.type === "COMPONENT";
-export const isComponentSet = (n: SceneNode): n is ComponentSetNode =>
-  n.type === "COMPONENT_SET";
-export const isGroup = (n: SceneNode): n is GroupNode => n.type === "GROUP";
+export const isFrame = (n: BaseNode | null): n is FrameNode =>
+  !!n && n.type === "FRAME";
+export const isInstance = (n: BaseNode | null): n is InstanceNode =>
+  !!n && n.type === "INSTANCE";
+export const isComponent = (n: BaseNode | null): n is ComponentNode =>
+  !!n && n.type === "COMPONENT";
+export const isComponentSet = (n: BaseNode | null): n is ComponentSetNode =>
+  !!n && n.type === "COMPONENT_SET";
+export const isGroup = (n: BaseNode | null): n is GroupNode =>
+  !!n && n.type === "GROUP";
 
 export type Composite =
   | FrameNode

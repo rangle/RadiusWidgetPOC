@@ -1,29 +1,29 @@
-import { TokenUse } from "./token.types";
+import { ComponentUsage, TokenUse } from "./token.types";
+import { TokenVariable } from "./variables.utils";
 
-const { widget } = figma;
-const { Text } = widget;
-export type TokeTypeName =
-  | "color"
-  | "spacing"
-  | "fontWeight"
-  | "lineHeight"
-  | "opacity"
-  | "strokeWidth"
-  | "borderWidth"
-  | "borderRadius"
-  | "animation";
-
-export const tokenTypeNames: Array<TokeTypeName> = [
+export const tokenTypeNames = [
   "color",
   "spacing",
   "fontWeight",
   "lineHeight",
   "opacity",
+  "stroke",
   "strokeWidth",
+  "width",
+  "height",
+  "textColor",
+  "backgroundColor",
   "borderWidth",
   "borderRadius",
   "animation",
-];
+  "margin",
+  "padding",
+  // two custom types
+  "grid",
+  "size",
+] as const;
+
+export type TokeTypeName = (typeof tokenTypeNames)[number];
 
 const isTokenType = (t: unknown): t is TokeTypeName =>
   tokenTypeNames.indexOf(t as TokeTypeName) !== -1;
@@ -51,15 +51,23 @@ export type TokenRule = {
 };
 
 export const tokenRules: Record<string, TokenRule> = {
-  "three-segments": {
-    title: "token name must have at least three segments",
-    validate: (name) =>
-      name.match(/([^.]*)\.([^.]*)\.([^.]*)/)
-        ? [true, ""]
-        : [
-            false,
-            `Token ${name} does not have the mandatory three segments: layer, type and subject`,
-          ],
+  "two-segments": {
+    title: "non-primitive token names must have at least three segments",
+    validate: (name) => {
+      const segments = name.split(".");
+      const [first, _second, third] = segments;
+      if (third) return [true, ""];
+      const tokenType = isTokenType(first) ? "primitive" : "semantic";
+      if (tokenType === "primitive" && segments.length === 2) return [true, ""];
+      if (tokenType === "semantic" && segments.length > 2) return [true, ""];
+      return [
+        false,
+        `${tokenType} token ${name} does not have the right number of segments:
+        for primitive tokens: {type}.{name}
+        for semantic tokens: {subject}.{type}.{attributes}...
+        `,
+      ];
+    },
   },
   "valid-case": {
     title: "token name segments must be in 'camelCase'",
@@ -70,9 +78,9 @@ export const tokenRules: Record<string, TokenRule> = {
         ? [true, ""]
         : [
             false,
-            `Token ${name} has segments with the worng format. Segments ${invalidSegments
+            `Token ${name} has segments with the wrong format. Segments ${invalidSegments
               .map((s) => `'${s}'`)
-              .join()} are not in camelCase.`,
+              .join(", ")} are not in camelCase.`,
             invalidSegments,
           ];
     },
@@ -80,20 +88,17 @@ export const tokenRules: Record<string, TokenRule> = {
   "valid-type": {
     title: "token name must have a valid type",
     validate: (name) => {
-      const [_, _subject, type, _attributes] =
-        name.match(/([^.]*)\.([^.]*)\.([^.]*)/) ?? [];
-
-      if (isTokenType(type)) return [true, ""];
+      const segments = name.split(".");
+      const [first, second] = segments;
+      const tokenType = segments.length === 2 ? "primitive" : "semantic";
+      const segment = tokenType === "primitive" ? first : second;
+      if (isTokenType(segment)) return [true, ""];
       else {
-        console.log(
-          "ERROR:",
-          [_subject, type, _attributes],
-          `Token ${name} has an invalid type '${type}'. Valid types are: ${tokenTypeNames.join()}`
-        );
         return [
           false,
-          `Token ${name} has an invalid type '${type}'. Valid types are: ${tokenTypeNames.join()}`,
-          [type],
+          `${tokenType} token ${name} has an invalid type '${segment}'. 
+          Valid types are: ${tokenTypeNames.join(", ")}`,
+          [segment],
         ];
       }
     },
@@ -113,31 +118,13 @@ export type TokenError = {
 
 type ReturnTuple = [ok: boolean, errs: TokenError[]];
 
-const RedSgmt: FunctionalWidget<TextProps & { onClick: () => void }> = ({
-  children,
-  onClick,
-}) => (
-  <Text
-    name="red-text-segment"
-    fill="#F00"
-    fontFamily="Roboto Mono"
-    fontSize={12}
-    fontWeight={700}
-    onClick={() => onClick()}
-  >
-    {children}
-  </Text>
-);
-
-const Sgmt: FunctionalWidget<TextProps> = ({ children }) => (
-  <Text name="text-segment" fill="#000" fontFamily="Roboto Mono" fontSize={12}>
-    {children}
-  </Text>
-);
-
 export const validateTokenName = (
   name: string,
-  showErrors: (errs: TokenError[]) => void
+  renderName: (
+    printableName: string,
+    errorsBySegment: Record<string, TokenError[]>,
+    ok: boolean
+  ) => FigmaDeclarativeNode
 ): readonly [node: FigmaDeclarativeNode, ok: boolean, errs: TokenError[]] => {
   const printableName = name.replaceAll("/", ".");
   const [ok, errs] = Object.entries(tokenRules).reduce<ReturnTuple>(
@@ -160,7 +147,6 @@ export const validateTokenName = (
     },
     [true, []]
   );
-  console.log(">", name, ok, errs);
 
   const errorsBySegment = errs.reduce((res, err) => {
     return {
@@ -175,23 +161,7 @@ export const validateTokenName = (
     };
   }, {} as Record<string, TokenError[]>);
 
-  const segments = printableName.split(".");
-  console.log(errorsBySegment);
-  // TODO: inject render function from the outside to be able to create a nicer floating hint
-  const renderedName = ok ? (
-    <Sgmt>{printableName}</Sgmt>
-  ) : (
-    segments.flatMap((segment, index) => [
-      errorsBySegment[segment] ? (
-        <RedSgmt onClick={() => showErrors(errorsBySegment[segment])}>
-          {segment}
-        </RedSgmt>
-      ) : (
-        <Sgmt>{segment}</Sgmt>
-      ),
-      <Sgmt>{index < segments.length - 1 ? "." : ""}</Sgmt>,
-    ])
-  );
+  const renderedName = renderName(printableName, errorsBySegment, ok);
   return [renderedName, ok, errs] as const;
 };
 
@@ -199,7 +169,30 @@ export const calculateSubjectsFromProps = (componentProps: TokenUse[]) =>
   componentProps.reduce((subjects, prop) => {
     const [_, subject, _type, _attributes] =
       prop.value.replaceAll("/", ".").match(/([^.]*)\.([^.]*)\.([^.]*)/) ?? [];
-    console.log("SUBJECT", [subject, _type, _attributes], prop.value);
     if (!subject || subjects.indexOf(subject) !== -1) return subjects;
     else return [...subjects, subject];
   }, [] as string[]);
+
+export const inferVariableType = (variable: TokenVariable): string => {
+  // from type and name
+  const segments = variable.name.split("/");
+  const [first, second] = segments;
+
+  if (tokenTypeNames.indexOf(second as TokeTypeName) !== -1) return second;
+  if (tokenTypeNames.indexOf(first as TokeTypeName) !== -1) return first;
+  return variable.type.toLocaleLowerCase();
+};
+
+export const combineComponentUsage = (
+  a: ComponentUsage,
+  b: ComponentUsage
+): ComponentUsage => {
+  return {
+    id: a.id,
+    name: a.name,
+    props: [...a.props, ...b.props],
+    children: a.children.map((ac, index) =>
+      combineComponentUsage(ac, b.children[index])
+    ),
+  };
+};
