@@ -31,16 +31,17 @@ export async function generateTemplateFrame(name: string, width: number, height:
 
   </AutoLayout>) as FrameNode;
 
-  const contentFrame = await figma.createNodeFromJSXAsync(<Frame
+  const contentFrame = await figma.createNodeFromJSXAsync(<AutoLayout
     name='.frame.content'
-    width={'fill-parent'}
-    height={'fill-parent'}
+    direction='vertical'
+    width={'hug-contents'}
+    height={'hug-contents'}
   >
-  </Frame>) as FrameNode;
+  </AutoLayout>) as FrameNode;
 
   const titleWrapper = await figma.createNodeFromJSXAsync(
     <AutoLayout
-      name={'template.frame.title'}
+      name={'.template.frame.title'}
       width={'fill-parent'}
       fill={{ type: 'solid', color: "#000" }}
       padding={32}
@@ -57,6 +58,7 @@ export async function generateTemplateFrame(name: string, width: number, height:
   const titleComponent = figma.createComponentFromNode(titleWrapper)
   titleComponent.y = -150;
   titleComponent.layoutSizingVertical = 'HUG'
+  titleComponent.name = '.template.frame.title'
 
   // create an instance of the new title component
   const titleInstance = titleComponent.createInstance()
@@ -66,8 +68,10 @@ export async function generateTemplateFrame(name: string, width: number, height:
   frame.appendChild(contentFrame);
 
   titleInstance.layoutSizingHorizontal = 'FILL';
-  contentFrame.layoutSizingHorizontal = 'FILL';
-  contentFrame.layoutSizingVertical = 'FILL';
+  contentFrame.layoutSizingHorizontal = 'HUG';
+  contentFrame.layoutSizingVertical = 'HUG';
+  frame.layoutSizingVertical = 'HUG';
+  frame.layoutSizingHorizontal = 'HUG';
 
   return frame
 }
