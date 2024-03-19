@@ -13,3 +13,12 @@ export type ComponentUsage = {
   props: TokenUse[];
   children: ComponentUsage[];
 };
+
+export type ComponentTokens = {
+  name: string;
+  attribute: string;
+  subjects: string[];
+  tokens: [string, string][];
+};
+
+export type TokenRecords = Record<string, Record<string, string>>;

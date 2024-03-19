@@ -4,22 +4,24 @@ import { isInstance, isComponent, isComponentSet } from "./figma.types";
 import { ComponentUsage } from "./token.types";
 import { combineComponentUsage } from "./token.utils";
 
+export const getMainComponent = async (
+  node: BaseNode
+): Promise<ComponentNode | null> =>
+  isInstance(node) ? await node.getMainComponentAsync() : null;
+
 export const getComponentSet = async (node: BaseNode) => {
   if (!node) {
     console.log("No node selected");
     throw new Error("no node selected");
   }
 
-  if (isInstance(node)) {
-    const main = await node.getMainComponentAsync();
+  const main = isComponent(node) ? node : await getMainComponent(node);
+  if (!main) return undefined;
+  const { parent } = main;
 
-    if (isComponent(main)) {
-      const { parent } = main;
+  // get the component set
+  if (isComponentSet(parent)) return parent;
 
-      // get the component set
-      if (isComponentSet(parent)) return parent;
-    }
-  }
   return undefined;
 };
 

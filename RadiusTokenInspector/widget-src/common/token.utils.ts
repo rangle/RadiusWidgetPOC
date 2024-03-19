@@ -1,4 +1,4 @@
-import { ComponentUsage, TokenUse } from "./token.types";
+import { ComponentUsage } from "./token.types";
 import { TokenVariable } from "./variables.utils";
 
 export const tokenTypeNames = [
@@ -165,10 +165,10 @@ export const validateTokenName = (
   return [renderedName, ok, errs] as const;
 };
 
-export const calculateSubjectsFromProps = (componentProps: TokenUse[]) =>
+export const calculateSubjectsFromProps = (componentProps: string[]) =>
   componentProps.reduce((subjects, prop) => {
     const [_, subject, _type, _attributes] =
-      prop.value.replaceAll("/", ".").match(/([^.]*)\.([^.]*)\.([^.]*)/) ?? [];
+      prop.replaceAll("/", ".").match(/([^.]*)\.([^.]*)\.([^.]*)/) ?? [];
     if (!subject || subjects.indexOf(subject) !== -1) return subjects;
     else return [...subjects, subject];
   }, [] as string[]);

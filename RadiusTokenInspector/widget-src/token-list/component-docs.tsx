@@ -61,7 +61,7 @@ export const ComponentDocs: FunctionalWidget<ComponentDocsProps> = ({
 }) => {
   if (!usage) return <EmptyComponentDocs />;
   const { id, name, props, children } = usage;
-  const subjects = calculateSubjectsFromProps(props);
+  const subjects = calculateSubjectsFromProps(props.map(({ value }) => value));
   const [componentIcon, titleTextSize]: [IconProps["icon"], number] = isChildren
     ? ["instance", 14]
     : ["component", 20];

@@ -1,4 +1,3 @@
-import { ComponentUsage } from "../common/token.types";
 import { Button } from "./button";
 import { Icon16px } from "./icon";
 
@@ -6,14 +5,16 @@ const { widget } = figma;
 const { Text, AutoLayout } = widget;
 
 export type WidgetHeaderProps = {
-  node: ComponentUsage | undefined;
+  loaded: boolean;
   addComponent: () => void;
+  addVariants: () => void;
   resetComponents: () => void;
 };
 
 export const WidgetHeader = ({
-  node,
+  loaded: node,
   addComponent,
+  addVariants,
   resetComponents,
 }: WidgetHeaderProps) => {
   return (
@@ -115,6 +116,9 @@ export const WidgetHeader = ({
         >
           <Button icon="add-box" onClick={() => addComponent()}>
             Add Component
+          </Button>
+          <Button icon="add-box" onClick={() => addVariants()}>
+            Add All Variants
           </Button>
         </AutoLayout>
       )}
