@@ -1,5 +1,5 @@
 const { widget } = figma;
-const { Text, AutoLayout, useSyncedState } = widget;
+const { Text, AutoLayout } = widget;
 import { TokenUse } from "../common/token.types";
 import { TokenError, validateTokenName } from "../common/token.utils";
 import { Icon16px } from "./icon";
@@ -8,7 +8,6 @@ export type PropUsage = {
   prop: TokenUse;
 };
 export const PropDocs: FunctionalWidget<PropUsage> = ({ prop }) => {
-  const [errs, setErrs] = useSyncedState<TokenError[]>(prop.value, []);
   return (
     <>
       <AutoLayout name="Component-prop" spacing={6} verticalAlignItems="center">
@@ -20,43 +19,8 @@ export const PropDocs: FunctionalWidget<PropUsage> = ({ prop }) => {
         >
           {prop.name}:
         </Text>
-        <PropValue
-          type={prop.from}
-          value={prop.value}
-          showErrors={(errs) => setErrs(errs)}
-        />
+        <PropValue type={prop.from} value={prop.value} />
       </AutoLayout>
-      {errs.length > 0 ? (
-        <AutoLayout
-          name="PropValue"
-          width={"hug-contents"}
-          fill={"#FFa9a3"}
-          cornerRadius={6}
-          overflow="visible"
-          padding={6}
-          verticalAlignItems="center"
-        >
-          {errs.map((err) => (
-            <AutoLayout direction="vertical" height={"hug-contents"}>
-              <AutoLayout direction="horizontal">
-                <Text fontSize={8} fill={"#777777"}>
-                  [{err.key}]
-                </Text>
-              </AutoLayout>
-              <AutoLayout direction="horizontal">
-                <Text fontSize={14} fontWeight={"bold"}>
-                  {err.title}
-                </Text>
-              </AutoLayout>
-              <AutoLayout direction="horizontal">
-                <Text fontSize={12}>{err.message}</Text>
-              </AutoLayout>
-            </AutoLayout>
-          ))}
-        </AutoLayout>
-      ) : (
-        <></>
-      )}
     </>
   );
 };
@@ -64,15 +28,82 @@ export const PropDocs: FunctionalWidget<PropUsage> = ({ prop }) => {
 export type PropValueType = {
   type: "variable" | "token studio";
   value: string;
-  showErrors: (errs: TokenError[]) => void;
 };
 
-export const PropValue: FunctionalWidget<PropValueType> = ({
-  type,
-  value,
-  showErrors,
-}) => {
-  const [renderedName, valid] = validateTokenName(value, showErrors);
+const htmlRenderError = (err: TokenError) =>
+  `<div><b style="color: red">${err.title}</b><br/><i>${err.message}</i><div>`;
+const htmlRenderErrorList = (errs: TokenError[]) =>
+  `<div style="width: auto; height: auto"><div style="padding: 0.5rem">${errs.map(
+    htmlRenderError
+  )}</div></div>`;
+
+const showErrors = async (
+  errors: Record<string, TokenError[]> | TokenError[]
+) => {
+  const errorsRendered = Array.isArray(errors)
+    ? htmlRenderErrorList(errors)
+    : Object.entries(errors)
+        .map(
+          ([segment, errors]) =>
+            `<h2>${segment}</h2>${htmlRenderErrorList(errors)}`
+        )
+        .join("\n");
+
+  await new Promise((_resolve) =>
+    figma.showUI(errorsRendered, {
+      visible: true,
+    })
+  );
+};
+
+const RedSgmt: FunctionalWidget<TextProps & { onClick: () => void }> = ({
+  children,
+  onClick,
+}) => (
+  <Text
+    name="red-text-segment"
+    fill="#F00"
+    fontFamily="Roboto Mono"
+    fontSize={12}
+    fontWeight={700}
+    onClick={() => onClick()}
+  >
+    {children}
+  </Text>
+);
+
+const Sgmt: FunctionalWidget<TextProps> = ({ children }) => (
+  <Text name="text-segment" fill="#000" fontFamily="Roboto Mono" fontSize={12}>
+    {children}
+  </Text>
+);
+
+function renderName(
+  printableName: string,
+  errorsBySegment: Record<string, TokenError[]>,
+  ok: boolean
+) {
+  const segments = printableName.split(".");
+  // TODO: inject render function from the outside to be able to create a nicer floating hint
+  const renderedName = ok ? (
+    <Sgmt>{printableName}</Sgmt>
+  ) : (
+    segments.flatMap((segment, index) => [
+      errorsBySegment[segment] ? (
+        <RedSgmt onClick={() => showErrors(errorsBySegment[segment])}>
+          {segment}
+        </RedSgmt>
+      ) : (
+        <Sgmt>{segment}</Sgmt>
+      ),
+      <Sgmt>{index < segments.length - 1 ? "." : ""}</Sgmt>,
+    ])
+  );
+  return renderedName;
+}
+
+export const PropValue: FunctionalWidget<PropValueType> = ({ type, value }) => {
+  const [renderedName, valid, errors] = validateTokenName(value, renderName);
   return (
     <>
       <AutoLayout
@@ -86,6 +117,7 @@ export const PropValue: FunctionalWidget<PropValueType> = ({
           bottom: 0,
           left: 2,
         }}
+        onClick={() => showErrors(errors)}
         verticalAlignItems="center"
       >
         <Icon16px icon={type === "variable" ? "variables" : "tokens"} />

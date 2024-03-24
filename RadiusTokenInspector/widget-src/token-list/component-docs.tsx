@@ -61,8 +61,7 @@ export const ComponentDocs: FunctionalWidget<ComponentDocsProps> = ({
 }) => {
   if (!usage) return <EmptyComponentDocs />;
   const { id, name, props, children } = usage;
-  const subjects = calculateSubjectsFromProps(props);
-  console.log("SUBJECTS!", subjects);
+  const subjects = calculateSubjectsFromProps(props.map(({ value }) => value));
   const [componentIcon, titleTextSize]: [IconProps["icon"], number] = isChildren
     ? ["instance", 14]
     : ["component", 20];
@@ -82,28 +81,8 @@ export const ComponentDocs: FunctionalWidget<ComponentDocsProps> = ({
     >
       <AutoLayout
         name="Component-Header"
-        stroke={[
-          {
-            type: "solid",
-            color: {
-              r: 0.5208333134651184,
-              g: 0.5208333134651184,
-              b: 0.5208333134651184,
-              a: 1,
-            },
-          },
-          {
-            opacity: 0.2,
-            type: "solid",
-            color: {
-              r: 0,
-              g: 0,
-              b: 0,
-              a: 1,
-            },
-          },
-        ]}
-        strokeWidth={0}
+        stroke={"#aaa"}
+        strokeWidth={1}
         overflow="visible"
         spacing="auto"
         width="fill-parent"
@@ -158,8 +137,8 @@ export const ComponentDocs: FunctionalWidget<ComponentDocsProps> = ({
               >
                 subjects:
               </Text>
-              {subjects.map((subject) => (
-                <Pill>{subject}</Pill>
+              {subjects.map((subject, idx) => (
+                <Pill key={idx}>{subject}</Pill>
               ))}
             </AutoLayout>
           </AutoLayout>
@@ -169,8 +148,8 @@ export const ComponentDocs: FunctionalWidget<ComponentDocsProps> = ({
       </AutoLayout>
       <AutoLayout
         name="Component-Content"
-        stroke="#000"
-        strokeWidth={0}
+        stroke={"#aaa"}
+        strokeWidth={1}
         overflow="visible"
         direction="vertical"
         spacing={6}

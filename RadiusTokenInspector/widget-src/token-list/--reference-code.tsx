@@ -164,8 +164,8 @@ export function WidgetCard() {
                 >
                   subjects:
                 </Text>
-                {subjects.map((subject) => (
-                  <Pill>{subject}</Pill>
+                {subjects.map((subject, idx) => (
+                  <Pill key={idx}>{subject}</Pill>
                 ))}
               </AutoLayout>
             ) : (

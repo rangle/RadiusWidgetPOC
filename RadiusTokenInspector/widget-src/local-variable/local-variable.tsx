@@ -60,7 +60,6 @@ export async function getLocalVariables(
           const value = await figma.variables.getVariableByIdAsync(
             variableValue.id
           );
-          console.log("singular", value);
           const alternateList = value
             ? ([
                 {

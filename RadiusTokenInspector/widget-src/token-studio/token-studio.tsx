@@ -5,7 +5,7 @@ export function getTokenStudioTokens(node: SceneNode): ComponentUsage {
   const sharedTokens = node.getSharedPluginDataKeys("tokens");
 
   const children = isComposite(node)
-    ? node.children.map(getTokenStudioTokens)
+    ? node?.children?.map(getTokenStudioTokens)
     : [];
   const props = sharedTokens.reduce((tokens: TokenUse[], token: string) => {
     return token === "version"
