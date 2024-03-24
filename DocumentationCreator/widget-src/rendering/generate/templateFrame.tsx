@@ -53,6 +53,7 @@ export async function generateTemplateFrame(name: string, width: number, height:
   textInstance.name = '.frame.title.text'
 
   titleWrapper.appendChild(textInstance)
+  textInstance.layoutSizingHorizontal = 'HUG'
 
   // create a title component including the text and wrapper
   const titleComponent = figma.createComponentFromNode(titleWrapper)
@@ -68,8 +69,10 @@ export async function generateTemplateFrame(name: string, width: number, height:
   frame.appendChild(contentFrame);
 
   titleInstance.layoutSizingHorizontal = 'FILL';
-  contentFrame.layoutSizingHorizontal = 'HUG';
+  contentFrame.layoutSizingHorizontal = 'FILL';
   contentFrame.layoutSizingVertical = 'HUG';
+  contentFrame.verticalPadding = 32;
+  contentFrame.horizontalPadding = 32;
   frame.layoutSizingVertical = 'HUG';
   frame.layoutSizingHorizontal = 'HUG';
 

@@ -3,7 +3,7 @@ import type { ComponentUsage } from "../common/token.types";
 import { getComponent, setComponentTexts } from "./utils";
 
 const { widget } = figma
-const { AutoLayout, Text } = widget
+const { AutoLayout } = widget
 
 const flattenTokens = (tokens: ComponentUsage): ComponentUsage[] => {
   const flattenedTokens = [tokens];
@@ -15,24 +15,8 @@ const flattenTokens = (tokens: ComponentUsage): ComponentUsage[] => {
   return flattenedTokens;
 }
 
-const tokenText = (value: ComponentUsage['props'][0]) => {
-  return <AutoLayout
-    name={value.name}
-    width={'fill-parent'}
-    direction="horizontal"
-    spacing={16}
-  >
-    <Text>
-      {value.name}
-    </Text>
-    <Text>
-      {value.value}
-    </Text>
-    <Text>
-      {value.from}
-    </Text>
-  </AutoLayout>
-}
+
+
 
 // this component will generate a component with all the tokens assiciated with a component
 // it will go through each child of the component looking for tokens

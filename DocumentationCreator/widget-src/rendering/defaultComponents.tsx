@@ -2,9 +2,10 @@ import { generateTemplateFrame } from './generate/templateFrame';
 import { generateTemplateTexts } from './generate/templateTexts';
 import { generateTemplateToken } from './generate/templateToken';
 import { generateTemplateCheckBoxes } from './generate/templateCheckboxes';
+import { generateAnnotation } from './generate/templateAnnotation';
+import { generateDoDontTemplate } from './generate/templateProperties';
 
 export async function generateDefaultComponents() {
-
   // is this page empty other than the widget?
   if (figma.currentPage.children.length > 1) {
     figma.notify('This page is not empty. Please create a new page to generate the default components.');
@@ -20,6 +21,9 @@ export async function generateDefaultComponents() {
   await generateTemplateFrame('Example Frame', 550, 1000, 0, 0);
   await generateTemplateToken(1000);
   await generateTemplateCheckBoxes();
+  await generateAnnotation();
+  await generateDoDontTemplate();
+
 
   // organize all the frames on the page
   const spacing = 20;

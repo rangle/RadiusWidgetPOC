@@ -1,7 +1,7 @@
 const { widget } = figma
 const { AutoLayout, Text } = widget
 import { getAllTokens, getAllLocalVariableTokens } from './tokens'
-import { generateDefaultComponents, createDocumentationPage, createPropertiesGrid, createComponentTokens } from './rendering'
+import { generateDefaultComponents, createDocumentationPage, createPropertiesGrid, createComponentTokens, createCheckBoxSection, HAND_OFF_SECTIONS } from './rendering'
 
 // get the selected node from the figma API and return it
 const getSelectedNode = async () => {
@@ -35,6 +35,21 @@ const createTokens = async () => {
 const clickGetTokens = async () => {
   console.log(await getAllLocalVariableTokens());
 }
+
+const clickCreateCheckBoxSection = async () => {
+  const frames = await createCheckBoxSection(HAND_OFF_SECTIONS);
+  if (!frames) return figma.notify('No frames created');
+
+  const wrapper = await figma.createNodeFromJSXAsync(<AutoLayout
+    direction='vertical'
+    spacing={10}
+  ></AutoLayout>) as FrameNode;
+  frames.forEach(frame => {
+    wrapper.appendChild(frame);
+    frame.layoutSizingHorizontal = 'FILL';
+  })
+
+};
 
 function Widget() {
   return <AutoLayout
@@ -75,6 +90,13 @@ function Widget() {
       fill={{ type: 'solid', color: '#fff' }}
     >
       <Text>Get Tokens</Text>
+    </AutoLayout>
+    <AutoLayout
+      onClick={clickCreateCheckBoxSection}
+      padding={20}
+      fill={{ type: 'solid', color: '#fff' }}
+    >
+      <Text>Create Checkbox Section</Text>
     </AutoLayout>
   </AutoLayout>
 }

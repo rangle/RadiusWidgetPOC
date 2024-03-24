@@ -51,6 +51,8 @@ type TemplateTypes = 'type=.template.tokenStudioIcon'
   | 'style=.template.text.checkBoxBody'
   | '.template.texts'
   | '.template.frame.title'
+  | 'checked=unchecked' // checkbox
+  | 'arrow location=topRight' // annotation arrow
 
 export async function getComponent(name: TemplateTypes) {
   if (!figma.currentPage.parent?.children) return false;

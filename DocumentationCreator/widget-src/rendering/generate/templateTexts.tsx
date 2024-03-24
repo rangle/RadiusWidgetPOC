@@ -35,7 +35,7 @@ export async function generateTemplateTexts(x: number) {
   const componentTitle = await figma.createNodeFromJSXAsync(<Text
     name={'.template.text.componentTitle'}
     fontSize={20}
-    font={{ family: 'Roboto Mono', style: 'Regular' }}
+    font={{ family: 'Roboto Mono', style: 'Bold' }}
     fill={{ type: 'solid', color: "#000" }}
     width={'fill-parent'}
     height={'hug-contents'}
@@ -55,7 +55,7 @@ export async function generateTemplateTexts(x: number) {
   const checkBoxTitle = await figma.createNodeFromJSXAsync(<Text
     name={'.template.text.checkBoxTitle'}
     fontSize={12}
-    font={{ family: 'Roboto Mono', style: 'Regular' }}
+    font={{ family: 'Roboto Mono', style: 'Bold' }}
     fill={{ type: 'solid', color: "#000" }}
     width={'fill-parent'}
     height={'hug-contents'}
@@ -71,6 +71,7 @@ export async function generateTemplateTexts(x: number) {
     height={'hug-contents'}
   >Checkbox Body</Text>) as TextNode;
   const checkBoxBodyComponent = figma.createComponentFromNode(checkBoxBody);
+
 
   // setup the component
   const newComponent = figma.combineAsVariants([
@@ -112,11 +113,30 @@ export async function generateTemplateTexts(x: number) {
   }
 
   bodyTextComponent.layoutAlign = 'STRETCH'
+  bodyTextComponent.layoutMode = 'VERTICAL'
+
   titleTextComponent.layoutAlign = 'STRETCH'
+  titleTextComponent.layoutMode = 'VERTICAL'
+
   componentTitleComponent.layoutAlign = 'STRETCH'
+  componentTitleComponent.layoutMode = 'VERTICAL'
+
   gridTitleComponent.layoutAlign = 'STRETCH'
+  gridTitleComponent.layoutMode = 'VERTICAL'
+
   checkBoxTitleComponent.layoutAlign = 'STRETCH'
+  checkBoxTitleComponent.layoutMode = 'VERTICAL'
+  checkBoxTitleComponent.layoutGrow = 1
+  checkBoxTitleComponent.paddingTop = 8;
+  checkBoxTitleComponent.layoutSizingVertical = 'HUG'
+  checkBoxTitle.layoutSizingHorizontal = 'FILL'
+
   checkBoxBodyComponent.layoutAlign = 'STRETCH'
+  checkBoxBodyComponent.layoutMode = 'VERTICAL'
+  checkBoxBodyComponent.layoutSizingVertical = 'HUG'
+  checkBoxBodyComponent.layoutGrow = 1
+  checkBoxBody.textAutoResize = 'HEIGHT'
+  checkBoxBody.layoutSizingHorizontal = 'FILL'
 
   return newComponent;
 }
