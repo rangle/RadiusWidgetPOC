@@ -6,7 +6,7 @@ import { generateDefaultComponents, createDocumentationPage, createPropertiesGri
 // get the selected node from the figma API and return it
 const getSelectedNode = async () => {
   const selectedNode = figma.currentPage.selection[0];
-  if (!selectedNode) return console.log('No node selected');
+  if (!selectedNode) return figma.notify('No node selected');
   const tokens = getAllTokens(selectedNode);
   console.log('tokens', tokens);
 };

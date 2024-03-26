@@ -42,3 +42,10 @@ type Token = {
   value: string;
   from: "Local Variable" | "Token Studio";
 };
+
+type ComponentOption = {
+  type: ComponentPropertyType;
+  defaultValue: string | boolean;
+  preferredValues?: InstanceSwapPreferredValue[];
+  variantOptions?: string[];
+};

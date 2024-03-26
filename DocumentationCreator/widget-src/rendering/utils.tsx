@@ -42,13 +42,15 @@ export async function getTemplate(name: string) {
   return false;
 }
 
-type TemplateTypes = 'type=.template.tokenStudioIcon'
+type TemplateTypes =
+  | 'type=.template.tokenStudioIcon'
   | 'type=.template.localVariableIcon'
   | 'style=.template.text.componentTitle'
   | 'style=.template.text.body'
   | 'style=.template.text.gridTitle'
   | 'style=.template.text.checkBoxTitle'
   | 'style=.template.text.checkBoxBody'
+  | '.template.annotation'
   | '.template.texts'
   | '.template.frame.title'
   | 'checked=unchecked' // checkbox
@@ -66,7 +68,10 @@ export async function getComponent(name: TemplateTypes) {
     await page.loadAsync();
 
     // find the frame with the name
-    const foundFrame = page.findOne(node => node.type === 'COMPONENT' && node.name === name);
+
+
+    const foundFrame = page.findOne(node => (node.type === 'COMPONENT_SET' || node.type === 'COMPONENT') && node.name === name);
+    if (foundFrame && foundFrame.type === 'COMPONENT_SET') return foundFrame.children[0] as ComponentNode
     if (foundFrame) return foundFrame as ComponentNode
   }
 
@@ -94,4 +99,11 @@ export async function setComponentTexts(component: SceneNode, texts: Record<stri
       newValue[instanceTextName] = texts[node.name];
       node.setProperties(newValue);
     });
+}
+
+export const getComponentProperties = (component: ComponentNode | ComponentSetNode) => {
+  const componentOptions: Record<string, ComponentOption> = component.type === 'COMPONENT' ?
+    (component.parent as ComponentSetNode).componentPropertyDefinitions :
+    component.componentPropertyDefinitions;
+  return componentOptions;
 }

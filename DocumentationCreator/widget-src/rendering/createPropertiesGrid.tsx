@@ -1,20 +1,13 @@
 import { isInstance } from "../common/figma.types";
 import { getComponent } from "./utils";
-import { setComponentTexts } from "./utils";
+import { setComponentTexts, getComponentProperties } from "./utils";
 
 const { widget } = figma
 const { AutoLayout } = widget
 
-type ComponentOption = {
-  type: ComponentPropertyType
-  defaultValue: string | boolean
-  preferredValues?: InstanceSwapPreferredValue[]
-  variantOptions?: string[]
-}
 
 
 export const createPropertiesGrid = async (selectedComponent: SceneNode) => {
-  console.log('\n\n====== create properties grid ======')
   if (!isInstance(selectedComponent)) {
     figma.notify('Please select a component or an instance to create a properties grid')
     return
@@ -36,7 +29,7 @@ export const createPropertiesGrid = async (selectedComponent: SceneNode) => {
     return
   }
 
-  const componentOptions = (component.parent as ComponentSetNode).componentPropertyDefinitions as Record<string, ComponentOption>;
+  const componentOptions = getComponentProperties(component);
 
   const maxOption = Object.entries(componentOptions).reduce((acc, [key, value]) => {
     if (!value.variantOptions) return acc
@@ -68,7 +61,6 @@ export const createPropertiesGrid = async (selectedComponent: SceneNode) => {
   title.name = 'gridTitle'
   setComponentTexts(title, { 'gridTitle': maxOption[0] });
   optionsFrame.appendChild(title)
-  console.log(componentOptions)
 
   // create an instance for each of the maxOptions
   maxOption[1].variantOptions?.forEach((option) => {

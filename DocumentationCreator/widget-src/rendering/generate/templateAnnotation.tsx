@@ -28,7 +28,6 @@ export const generateAnnotation = async () => {
   // top right
   const annotationWrapperRight = annotationWrapper.clone();
   annotationWrapperRight.name = 'topRight'
-  console.log(annotationWrapperRight)
   const annotationArrowTopRight = annotationWrapperRight.findOne(node => node.name === '.template.annotation.arrow') as VectorNode;
   annotationArrowTopRight.x = 309
   annotationArrowTopRight.y = 1

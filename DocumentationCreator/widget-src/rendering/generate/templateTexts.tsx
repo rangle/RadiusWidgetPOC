@@ -72,6 +72,25 @@ export async function generateTemplateTexts(x: number) {
   >Checkbox Body</Text>) as TextNode;
   const checkBoxBodyComponent = figma.createComponentFromNode(checkBoxBody);
 
+  const tableTitle = await figma.createNodeFromJSXAsync(<Text
+    name={'.template.text.tableTitle'}
+    fontSize={12}
+    font={{ family: 'Roboto Mono', style: 'Bold' }}
+    fill={{ type: 'solid', color: "#000" }}
+    width={'fill-parent'}
+    height={'hug-contents'}
+  >Table Title</Text>) as TextNode;
+  const tableTitleComponent = figma.createComponentFromNode(tableTitle);
+
+  const tableBody = await figma.createNodeFromJSXAsync(<Text
+    name={'.template.text.tableBody'}
+    fontSize={12}
+    font={{ family: 'Roboto Mono', style: 'Regular' }}
+    fill={{ type: 'solid', color: "#000" }}
+    width={'fill-parent'}
+    height={'hug-contents'}
+  >Table Boy</Text>) as TextNode;
+  const tableBodyComponent = figma.createComponentFromNode(tableBody);
 
   // setup the component
   const newComponent = figma.combineAsVariants([
@@ -80,7 +99,9 @@ export async function generateTemplateTexts(x: number) {
     componentTitleComponent,
     gridTitleComponent,
     checkBoxTitleComponent,
-    checkBoxBodyComponent],
+    checkBoxBodyComponent,
+    tableTitleComponent,
+    tableBodyComponent],
     figma.currentPage
   )
   newComponent.name = '.template.texts'
@@ -88,6 +109,7 @@ export async function generateTemplateTexts(x: number) {
   newComponent.layoutMode = 'VERTICAL'
   newComponent.editComponentProperty('Property 1', { name: 'style' })
   newComponent.fills = [{ type: 'SOLID', color: { r: 0.5, g: 0.5, b: 0.5 } }]
+  newComponent.itemSpacing = 16
 
   // For the components, make their text property a variable
   newComponent.addComponentProperty('text', 'TEXT', 'Hello world')
@@ -109,6 +131,12 @@ export async function generateTemplateTexts(x: number) {
     characters: textVariableName
   }
   checkBoxBody.componentPropertyReferences = {
+    characters: textVariableName
+  }
+  tableTitle.componentPropertyReferences = {
+    characters: textVariableName
+  }
+  tableBody.componentPropertyReferences = {
     characters: textVariableName
   }
 
@@ -134,9 +162,20 @@ export async function generateTemplateTexts(x: number) {
   checkBoxBodyComponent.layoutAlign = 'STRETCH'
   checkBoxBodyComponent.layoutMode = 'VERTICAL'
   checkBoxBodyComponent.layoutSizingVertical = 'HUG'
-  checkBoxBodyComponent.layoutGrow = 1
   checkBoxBody.textAutoResize = 'HEIGHT'
   checkBoxBody.layoutSizingHorizontal = 'FILL'
+
+  tableTitleComponent.layoutAlign = 'STRETCH'
+  tableTitleComponent.layoutMode = 'VERTICAL'
+  tableTitleComponent.layoutSizingVertical = 'HUG'
+  tableTitle.textAutoResize = 'HEIGHT'
+  tableTitle.layoutSizingHorizontal = 'FILL'
+
+  tableBodyComponent.layoutAlign = 'STRETCH'
+  tableBodyComponent.layoutMode = 'VERTICAL'
+  tableBodyComponent.layoutSizingVertical = 'HUG'
+  tableBody.textAutoResize = 'HEIGHT'
+  tableBody.layoutSizingHorizontal = 'FILL'
 
   return newComponent;
 }

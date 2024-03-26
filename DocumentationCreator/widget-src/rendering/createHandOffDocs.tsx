@@ -1,6 +1,4 @@
-const { widget } = figma
-const { AutoLayout } = widget
-import { getComponent, setComponentTexts, getTemplate } from './utils';
+import { setComponentTexts, getTemplate } from './utils';
 
 export const HAND_OFF_SECTIONS = {
   'Anatomy': [

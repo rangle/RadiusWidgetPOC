@@ -3,7 +3,7 @@ import { generateTemplateTexts } from './generate/templateTexts';
 import { generateTemplateToken } from './generate/templateToken';
 import { generateTemplateCheckBoxes } from './generate/templateCheckboxes';
 import { generateAnnotation } from './generate/templateAnnotation';
-import { generateDoDontTemplate } from './generate/templateProperties';
+import { generatePropertiesTemplates } from './generate/templateProperties';
 
 export async function generateDefaultComponents() {
   // is this page empty other than the widget?
@@ -22,7 +22,7 @@ export async function generateDefaultComponents() {
   await generateTemplateToken(1000);
   await generateTemplateCheckBoxes();
   await generateAnnotation();
-  await generateDoDontTemplate();
+  await generatePropertiesTemplates();
 
 
   // organize all the frames on the page
