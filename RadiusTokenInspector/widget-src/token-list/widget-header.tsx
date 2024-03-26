@@ -6,16 +6,12 @@ const { Text, AutoLayout } = widget;
 
 export type WidgetHeaderProps = {
   loaded: boolean;
-  addComponent: () => void;
   addVariants: () => void;
-  resetComponents: () => void;
 };
 
 export const WidgetHeader = ({
   loaded: node,
-  addComponent,
   addVariants,
-  resetComponents,
 }: WidgetHeaderProps) => {
   return (
     <AutoLayout
@@ -43,17 +39,7 @@ export const WidgetHeader = ({
         <>
           <AutoLayout
             name="button"
-            fill={{
-              opacity: 0,
-              type: "solid",
-              color: {
-                r: 0,
-                g: 0,
-                b: 0,
-                a: 1,
-              },
-            }}
-            stroke="#262626"
+            fill="#000"
             overflow="visible"
             padding={{
               vertical: 4,
@@ -62,50 +48,15 @@ export const WidgetHeader = ({
             horizontalAlignItems="center"
             verticalAlignItems="center"
           >
-            <Button icon="refresh" onClick={() => addComponent()}>
+            <Button icon="refresh" onClick={() => addVariants()}>
               Replace Component
-            </Button>
-          </AutoLayout>
-          <AutoLayout
-            name="button"
-            fill={{
-              opacity: 0,
-              type: "solid",
-              color: {
-                r: 0,
-                g: 0,
-                b: 0,
-                a: 1,
-              },
-            }}
-            stroke="#262626"
-            overflow="visible"
-            padding={{
-              vertical: 4,
-              horizontal: 6,
-            }}
-            horizontalAlignItems="center"
-            verticalAlignItems="center"
-          >
-            <Button icon="close" onClick={() => resetComponents()}>
-              Reset
             </Button>
           </AutoLayout>
         </>
       ) : (
         <AutoLayout
           name="button"
-          fill={{
-            opacity: 0,
-            type: "solid",
-            color: {
-              r: 0,
-              g: 0,
-              b: 0,
-              a: 1,
-            },
-          }}
-          stroke="#262626"
+          fill="#000"
           overflow="visible"
           padding={{
             vertical: 4,
@@ -114,11 +65,8 @@ export const WidgetHeader = ({
           horizontalAlignItems="center"
           verticalAlignItems="center"
         >
-          <Button icon="add-box" onClick={() => addComponent()}>
-            Add Component
-          </Button>
           <Button icon="add-box" onClick={() => addVariants()}>
-            Add All Variants
+            Inspect Component
           </Button>
         </AutoLayout>
       )}

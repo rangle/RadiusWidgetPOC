@@ -50,6 +50,8 @@ export type TokenRule = {
   ) => readonly [boolean, string] | readonly [boolean, string, string[]];
 };
 
+const v3Tokens = true;
+
 export const tokenRules: Record<string, TokenRule> = {
   "two-segments": {
     title: "non-primitive token names must have at least three segments",
@@ -105,6 +107,61 @@ export const tokenRules: Record<string, TokenRule> = {
   },
 };
 
+export const v3TokenRules: Record<string, TokenRule> = {
+  "two-segments": {
+    title: "non-primitive token names must have at least three segments",
+    validate: (name) => {
+      const segments = name.split(".");
+      const [_layer, first, _second, third] = segments;
+      if (third) return [true, ""];
+      const tokenType = isTokenType(first) ? "primitive" : "semantic";
+      if (tokenType === "primitive" && segments.length === 3) return [true, ""];
+      if (tokenType === "semantic" && segments.length > 3) return [true, ""];
+      return [
+        false,
+        `${tokenType} token ${name} does not have the right number of segments:
+        for primitive tokens: {layer}.{type}.{name}
+        for semantic tokens: {layer}.{subject}.{type}.{attributes}...
+        `,
+      ];
+    },
+  },
+  "valid-case": {
+    title: "token name segments must be in 'camelCase'",
+    validate: (name) => {
+      const segments = name.split(".");
+      const invalidSegments = segments.filter((s) => !isCamelCase(s));
+      return invalidSegments.length === 0
+        ? [true, ""]
+        : [
+            false,
+            `Token ${name} has segments with the wrong format. Segments ${invalidSegments
+              .map((s) => `'${s}'`)
+              .join(", ")} are not in camelCase.`,
+            invalidSegments,
+          ];
+    },
+  },
+  "valid-type": {
+    title: "token name must have a valid type",
+    validate: (name) => {
+      const segments = name.split(".");
+      const [_layer, first, second] = segments;
+      const tokenType = segments.length === 3 ? "primitive" : "semantic";
+      const segment = tokenType === "primitive" ? first : second;
+      if (isTokenType(segment)) return [true, ""];
+      else {
+        return [
+          false,
+          `${tokenType} token ${name} has an invalid type '${segment}'. 
+          Valid types are: ${tokenTypeNames.join(", ")}`,
+          [segment],
+        ];
+      }
+    },
+  },
+};
+
 /// TODO: move this to a test file
 // console.log("first.second.third".match(/([^.])*\.([^.])*\.([^.])*/));
 //
@@ -127,7 +184,9 @@ export const validateTokenName = (
   ) => FigmaDeclarativeNode
 ): readonly [node: FigmaDeclarativeNode, ok: boolean, errs: TokenError[]] => {
   const printableName = name.replaceAll("/", ".");
-  const [ok, errs] = Object.entries(tokenRules).reduce<ReturnTuple>(
+  // TODO: inject this boolean from the UI
+  const rules = v3Tokens ? v3TokenRules : tokenRules;
+  const [ok, errs] = Object.entries(rules).reduce<ReturnTuple>(
     ([ok, errs], [key, rule]) => {
       const [valid, errMsg, segments] = rule.validate(printableName);
       return ok && valid
@@ -167,9 +226,10 @@ export const validateTokenName = (
 
 export const calculateSubjectsFromProps = (componentProps: string[]) =>
   componentProps.reduce((subjects, prop) => {
-    const [_, subject, _type, _attributes] =
+    const [_, _layer, subject, _type, _attributes] =
       prop.replaceAll("/", ".").match(/([^.]*)\.([^.]*)\.([^.]*)/) ?? [];
-    if (!subject || subjects.indexOf(subject) !== -1) return subjects;
+    if (!subject || subjects.indexOf(subject) !== -1 || isTokenType(subject))
+      return subjects;
     else return [...subjects, subject];
   }, [] as string[]);
 

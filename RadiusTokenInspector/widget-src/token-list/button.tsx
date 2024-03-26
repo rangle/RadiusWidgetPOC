@@ -12,7 +12,6 @@ export const Button: FunctionalWidget<ButtonProps> = ({
 }) => (
   <AutoLayout
     name="label"
-    cornerRadius={26}
     overflow="visible"
     spacing={8}
     horizontalAlignItems="center"
@@ -21,7 +20,7 @@ export const Button: FunctionalWidget<ButtonProps> = ({
   >
     <Text
       name="Button Label"
-      fill="#262626"
+      fill="#fff"
       verticalAlignText="center"
       horizontalAlignText="center"
       lineHeight="150%"
@@ -31,6 +30,6 @@ export const Button: FunctionalWidget<ButtonProps> = ({
     >
       {children}
     </Text>
-    <Icon16px icon={icon} />
+    <Icon16px icon={icon} color="#fff" />
   </AutoLayout>
 );

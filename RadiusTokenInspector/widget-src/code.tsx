@@ -19,100 +19,102 @@ import { VariantsDocs } from "./token-list/variants-docs";
 
 // get the selected node from the figma API and return it
 export const getSelectedNode = async () => {
-  const selectedNode = figma.currentPage.selection[0];
+  console.log("in select node");
+  const selectedNode = figma?.currentPage?.selection[0];
+  console.log("==========>>>>>>>>>", selectedNode);
   if (!selectedNode) {
-    console.log("No node selected");
+    console.warn("No node selected");
     throw new Error("no node selected");
   }
 
-  if (!isInstance(selectedNode)) return undefined;
+  if (isInstance(selectedNode)) {
+    console.log("==========>>>>>>>>> INSTANCE", selectedNode);
 
-  // const set = await getComponentSet(selectedNode);
-  // const matrix = getVariantMatrix(set);
+    const main = await selectedNode.getMainComponentAsync();
 
-  // console.log("==========>>>>>>>>>", matrix);
+    console.log("================>....");
 
-  const main = await selectedNode.getMainComponentAsync();
+    // const set = await getComponentSet(selectedNode);
+    // if (set && set.children) {
+    //   // obtain the default props for each prop
+    //   const defaultProps = Object.entries(set.componentPropertyDefinitions)
+    //     .map(([propName, prop]) => {
+    //       if (prop.type === "VARIANT" && prop.variantOptions) {
+    //         const defaultVariant =
+    //           prop.variantOptions.find((v) => v.indexOf("✦") !== -1) ??
+    //           prop.variantOptions[0];
+    //         return [propName, defaultVariant];
+    //       }
+    //     })
+    //     .filter(isNotNil);
+    //   const defaultPropsMap = Object.fromEntries(defaultProps);
+    //   console.log("PROP >>>>", defaultProps);
 
-  // if (!main) return undefined;
+    //   // find the one component that has all defaults
+    //   const [allDefault] = set.children.filter(
+    //     (n) =>
+    //       isComponent(n) &&
+    //       defaultProps.every(([k, v]) => n.variantProperties?.[k] === v)
+    //   );
 
-  //  const node = await getTokensFromNode(main);
+    //   if (!isComponent(allDefault)) return undefined;
 
-  console.log("================>..");
+    //   // get its tokens/variables
+    //   const node = await getTokensFromNode(allDefault);
+    //   const mainTokens = flatTokenList(node, "component");
 
-  // const set = await getComponentSet(selectedNode);
-  // if (set && set.children) {
-  //   // obtain the default props for each prop
-  //   const defaultProps = Object.entries(set.componentPropertyDefinitions)
-  //     .map(([propName, prop]) => {
-  //       if (prop.type === "VARIANT" && prop.variantOptions) {
-  //         const defaultVariant =
-  //           prop.variantOptions.find((v) => v.indexOf("✦") !== -1) ??
-  //           prop.variantOptions[0];
-  //         return [propName, defaultVariant];
-  //       }
-  //     })
-  //     .filter(isNotNil);
-  //   const defaultPropsMap = Object.fromEntries(defaultProps);
-  //   console.log("PROP >>>>", defaultProps);
+    //   // for every prop, find the components that vary that one prop while leaving the rest default
+    //   const results = defaultProps.reduce((acc, [propName]) => {
+    //     console.log(">>>>>", propName);
+    //     const components = getVariantListByFilter(set, (variant) => {
+    //       // for every prop in the component that is not the current one
+    //       const filterProps = Object.entries(
+    //         variant.variantProperties ?? {}
+    //       ).filter(([name]) => propName !== name);
+    //       // select the component that has the default value for those properties
+    //       return filterProps.every(
+    //         ([name, value]) => defaultPropsMap[name] === value
+    //       );
+    //     });
 
-  //   // find the one component that has all defaults
-  //   const [allDefault] = set.children.filter(
-  //     (n) =>
-  //       isComponent(n) &&
-  //       defaultProps.every(([k, v]) => n.variantProperties?.[k] === v)
-  //   );
+    //     // now for each one of these components grab their tokens and generate a diff with the default tokens
+    //     const result = components.map(async (variant) => {
+    //       if (isComponent(variant)) {
+    //         const tokens = await getTokensFromNode(variant).then((node) =>
+    //           flatTokenList(node, "component")
+    //         );
 
-  //   if (!isComponent(allDefault)) return undefined;
+    //         const attributes = [
+    //           propName,
+    //           variant.variantProperties?.[propName],
+    //         ].join(" ");
+    //         const differences = diffRecordValues(mainTokens, tokens);
+    //         console.log(">>>", attributes, differences);
+    //         return [attributes, differences] as const;
+    //       }
+    //     });
+    //     return [...acc, ...result];
+    //   }, [] as Promise<readonly [string, Record<string, string>] | undefined>[]);
 
-  //   // get its tokens/variables
-  //   const node = await getTokensFromNode(allDefault);
-  //   const mainTokens = flatTokenList(node, "component");
+    //   const r = (await Promise.all(results)).filter(isNotNil);
+    //   const resultMap = Object.fromEntries(r);
 
-  //   // for every prop, find the components that vary that one prop while leaving the rest default
-  //   const results = defaultProps.reduce((acc, [propName]) => {
-  //     console.log(">>>>>", propName);
-  //     const components = getVariantListByFilter(set, (variant) => {
-  //       // for every prop in the component that is not the current one
-  //       const filterProps = Object.entries(
-  //         variant.variantProperties ?? {}
-  //       ).filter(([name]) => propName !== name);
-  //       // select the component that has the default value for those properties
-  //       return filterProps.every(
-  //         ([name, value]) => defaultPropsMap[name] === value
-  //       );
-  //     });
+    //   console.log("***", resultMap);
+    //   return {
+    //     default: mainTokens,
+    //     ...resultMap,
+    //   };
+    // }
 
-  //     // now for each one of these components grab their tokens and generate a diff with the default tokens
-  //     const result = components.map(async (variant) => {
-  //       if (isComponent(variant)) {
-  //         const tokens = await getTokensFromNode(variant).then((node) =>
-  //           flatTokenList(node, "component")
-  //         );
+    return main;
+  }
 
-  //         const attributes = [
-  //           propName,
-  //           variant.variantProperties?.[propName],
-  //         ].join(" ");
-  //         const differences = diffRecordValues(mainTokens, tokens);
-  //         console.log(">>>", attributes, differences);
-  //         return [attributes, differences] as const;
-  //       }
-  //     });
-  //     return [...acc, ...result];
-  //   }, [] as Promise<readonly [string, Record<string, string>] | undefined>[]);
-
-  //   const r = (await Promise.all(results)).filter(isNotNil);
-  //   const resultMap = Object.fromEntries(r);
-
-  //   console.log("***", resultMap);
-  //   return {
-  //     default: mainTokens,
-  //     ...resultMap,
-  //   };
-  // }
-
-  return main;
+  if (isComponent(selectedNode)) {
+    console.log(">> COMPONENTS", selectedNode);
+    return selectedNode;
+  }
+  console.log("NOT A COMPONENT");
+  return undefined;
 };
 
 const getTokenList = async (
@@ -190,25 +192,30 @@ const getTokenList = async (
       ...resultMap,
     } satisfies TokenRecords;
   }
+
+  if (isComponent(node)) {
+    console.log("Single component selected");
+    // get its tokens/variables
+    const tokens = await getTokensFromNode(node);
+    const defaultTokens = flatTokenList(tokens, "component");
+    return {
+      default: defaultTokens,
+    };
+  }
+
+  console.log("Invalid selection");
   return undefined;
 };
 
 type NodeTokensProps = {
   usage: ComponentUsage | undefined;
-  inspect: () => void;
   document: () => void;
-  isDeleted: (id: string) => boolean;
-  resetComponents: () => void;
   deleteComponent: (id: string) => void;
 };
 
 export const NodeTokens = ({
   usage,
-  inspect,
   document,
-  isDeleted,
-  deleteComponent,
-  resetComponents,
 }: NodeTokensProps) => {
   return (
     <AutoLayout
@@ -230,16 +237,9 @@ export const NodeTokens = ({
       spacing={6}
       padding={12}
     >
-      <WidgetHeader
-        loaded={!!usage}
-        addVariants={document}
-        addComponent={inspect}
-        resetComponents={() => resetComponents()}
-      />
+      <WidgetHeader loaded={!!usage} addVariants={document} />
       <ComponentDocs
         usage={usage}
-        deleteComponent={deleteComponent}
-        isDeleted={isDeleted}
       />
     </AutoLayout>
   );
@@ -274,12 +274,7 @@ export const VariantTokens: FunctionalWidget<VariantTokensProps> = ({
       spacing={6}
       padding={12}
     >
-      <WidgetHeader
-        loaded={true}
-        addComponent={() => {}}
-        addVariants={() => {}}
-        resetComponents={() => {}}
-      />
+      <WidgetHeader loaded={true} addVariants={() => {}} />
       <VariantsDocs name={name} tokenList={tokens} />
     </AutoLayout>
   );
@@ -315,8 +310,10 @@ export function Widget() {
           .then((usage) => setNode(usage));
       }}
       document={() => {
+        console.log("BEFORE SELECT NODE");
         getSelectedNode()
           .then((node) => {
+            console.log("after getCurrentNode");
             if (!node) throw new Error("No component selected");
             // setName(node.name);
             return getTokenList(node);
