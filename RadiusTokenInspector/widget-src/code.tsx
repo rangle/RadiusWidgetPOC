@@ -1,11 +1,11 @@
 const { widget } = figma;
 const { AutoLayout, useSyncedState } = widget;
 
-import { ComponentUsage, TokenRecords } from "./common/token.types";
+import { TokenRecords } from "./common/token.types";
 
-import { WidgetHeader, ComponentDocs } from "./token-list";
-import { getAllLocalVariableTokens } from "./common/variables.utils";
-import { generateLayerFile } from "./common/generator.utils";
+import { WidgetHeader } from "./token-list";
+// import { getAllLocalVariableTokens } from "./common/variables.utils";
+// import { generateLayerFile } from "./common/generator.utils";
 import { isComponent, isInstance } from "./common/figma.types";
 import {
   diffRecordValues,
@@ -15,7 +15,7 @@ import {
   getVariantListByFilter,
   isNotNil,
 } from "./common/component.utils";
-import { VariantsDocs } from "./token-list/variants-docs";
+import { EmptyComponentDocs, VariantsDocs } from "./token-list/variants-docs";
 
 // get the selected node from the figma API and return it
 export const getSelectedNode = async () => {
@@ -207,51 +207,15 @@ const getTokenList = async (
   return undefined;
 };
 
-type NodeTokensProps = {
-  usage: ComponentUsage | undefined;
-  document: () => void;
-  deleteComponent: (id: string) => void;
-};
-
-export const NodeTokens = ({
-  usage,
-  document,
-}: NodeTokensProps) => {
-  return (
-    <AutoLayout
-      name="WidgetFrame"
-      effect={{
-        type: "drop-shadow",
-        color: "#00000040",
-        offset: {
-          x: 0,
-          y: 4,
-        },
-        blur: 4,
-        showShadowBehindNode: false,
-      }}
-      fill="#F6F6F6"
-      stroke="#858585"
-      cornerRadius={6}
-      direction="vertical"
-      spacing={6}
-      padding={12}
-    >
-      <WidgetHeader loaded={!!usage} addVariants={document} />
-      <ComponentDocs
-        usage={usage}
-      />
-    </AutoLayout>
-  );
-};
-
 export type VariantTokensProps = {
   name: string;
-  tokens: TokenRecords;
+  document: () => void;
+  tokens?: TokenRecords;
 };
 
 export const VariantTokens: FunctionalWidget<VariantTokensProps> = ({
   name,
+  document,
   tokens,
 }) => {
   return (
@@ -274,65 +238,81 @@ export const VariantTokens: FunctionalWidget<VariantTokensProps> = ({
       spacing={6}
       padding={12}
     >
-      <WidgetHeader loaded={true} addVariants={() => {}} />
+      <WidgetHeader loaded={true} addVariants={document} />
       <VariantsDocs name={name} tokenList={tokens} />
     </AutoLayout>
   );
 };
 
 export function Widget() {
-  const [node, setNode] = useSyncedState<ComponentUsage | undefined>(
-    "nodes",
-    undefined
-  );
   const [name, setName] = useSyncedState<string>("name", "");
-  const [deleted, setDeleted] = useSyncedState<string[]>("deletedNodes", []);
   const [variantTokens, setVariantTokens] = useSyncedState<
     TokenRecords | undefined
   >("componentTokens", undefined);
 
-  return variantTokens ? (
-    <VariantTokens name={name} tokens={variantTokens} />
-  ) : (
-    <NodeTokens
-      usage={node}
-      inspect={() => {
-        getAllLocalVariableTokens().then((collections) => {
-          const result = generateLayerFile(collections);
-          console.log("==================>", result);
-        });
+  console.log({ variantTokens });
 
-        getSelectedNode()
-          .then((node) => {
-            if (!node) throw new Error("No component selected");
-            return getTokensFromNode(node);
-          })
-          .then((usage) => setNode(usage));
-      }}
-      document={() => {
-        console.log("BEFORE SELECT NODE");
-        getSelectedNode()
-          .then((node) => {
-            console.log("after getCurrentNode");
-            if (!node) throw new Error("No component selected");
-            // setName(node.name);
-            return getTokenList(node);
-          })
-          .then((list) => {
-            console.log("PRE", list);
-            return setVariantTokens(list);
-          });
-      }}
-      isDeleted={(id: string) => deleted.indexOf(id) !== -1}
-      deleteComponent={(id: string) => {
-        if (deleted.indexOf(id) === -1) setDeleted([...deleted, id]);
-      }}
-      resetComponents={() => {
-        setNode(undefined);
-        setDeleted([]);
-      }}
+  if (!variantTokens) {
+    return (
+      <AutoLayout
+        name="WidgetFrame"
+        effect={{
+          type: "drop-shadow",
+          color: "#00000040",
+          offset: {
+            x: 0,
+            y: 4,
+          },
+          blur: 4,
+          showShadowBehindNode: false,
+        }}
+        fill="#F6F6F6"
+        stroke="#858585"
+        cornerRadius={6}
+        direction="vertical"
+        spacing={6}
+        padding={12}
+      >
+        <WidgetHeader
+          loaded={true}
+          addVariants={documentVariants(setVariantTokens)}
+        />
+        <EmptyComponentDocs />
+      </AutoLayout>
+    );
+  }
+
+  return (
+    <VariantTokens
+      name={name}
+      tokens={variantTokens}
+      document={documentVariants(setVariantTokens)}
     />
   );
 }
 
 widget.register(Widget);
+
+function documentVariants(
+  setVariantTokens: (
+    newValue:
+      | TokenRecords
+      | ((currValue: TokenRecords | undefined) => TokenRecords | undefined)
+      | undefined
+  ) => void
+): () => void {
+  return () => {
+    console.log("BEFORE SELECT NODE");
+    getSelectedNode()
+      .then((node) => {
+        console.log("after getCurrentNode");
+        if (!node) throw new Error("No component selected");
+        // setName(node.name);
+        return getTokenList(node);
+      })
+      .then((list) => {
+        console.log("PRE", list);
+        return setVariantTokens(list);
+      });
+  };
+}

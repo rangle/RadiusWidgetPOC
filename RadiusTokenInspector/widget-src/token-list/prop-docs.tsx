@@ -9,19 +9,12 @@ export type PropUsage = {
 };
 export const PropDocs: FunctionalWidget<PropUsage> = ({ prop }) => {
   return (
-    <>
-      <AutoLayout name="Component-prop" spacing={6} verticalAlignItems="center">
-        <Text
-          name="prop-name"
-          fill="#000"
-          fontFamily="Roboto Mono"
-          fontSize={12}
-        >
-          {prop.name}:
-        </Text>
-        <PropValue type={prop.from} value={prop.value} />
-      </AutoLayout>
-    </>
+    <AutoLayout name="Component-prop" spacing={6} verticalAlignItems="center">
+      <Text name="prop-name" fill="#000" fontFamily="Roboto Mono" fontSize={12}>
+        {prop.name}:
+      </Text>
+      <PropValue type={prop.from} value={prop.value} />
+    </AutoLayout>
   );
 };
 
@@ -103,42 +96,42 @@ function renderName(
 }
 
 export const PropValue: FunctionalWidget<PropValueType> = ({ type, value }) => {
-  const [renderedName, valid, errors] = validateTokenName(value, renderName);
+  console.log("Validating token Name");
+  const [name, valid, errors, errorsBySegment] = validateTokenName(value);
+  console.log("valid", type, value, valid, errors);
   return (
-    <>
+    <AutoLayout
+      name="PropValue"
+      fill={valid ? "#C4D8F3" : "#F2C94C73"}
+      cornerRadius={6}
+      overflow="visible"
+      padding={{
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 2,
+      }}
+      onClick={() => showErrors(errors)}
+      verticalAlignItems="center"
+    >
+      <Icon16px icon={type === "variable" ? "variables" : "tokens"} />
+
       <AutoLayout
-        name="PropValue"
-        fill={valid ? "#C4D8F3" : "#F2C94C73"}
-        cornerRadius={6}
-        overflow="visible"
-        padding={{
-          top: 0,
-          right: 0,
-          bottom: 0,
-          left: 2,
+        name="PropertyValue"
+        fill="#D3E6FF"
+        cornerRadius={{
+          topLeft: 0,
+          topRight: 6,
+          bottomRight: 6,
+          bottomLeft: 0,
         }}
-        onClick={() => showErrors(errors)}
+        overflow="visible"
+        spacing={0}
+        padding={4}
         verticalAlignItems="center"
       >
-        <Icon16px icon={type === "variable" ? "variables" : "tokens"} />
-
-        <AutoLayout
-          name="PropertyValue"
-          fill="#D3E6FF"
-          cornerRadius={{
-            topLeft: 0,
-            topRight: 6,
-            bottomRight: 6,
-            bottomLeft: 0,
-          }}
-          overflow="visible"
-          spacing={0}
-          padding={4}
-          verticalAlignItems="center"
-        >
-          {renderedName}
-        </AutoLayout>
+        {valid ? name : renderName(name, errorsBySegment, valid)}
       </AutoLayout>
-    </>
+    </AutoLayout>
   );
 };
