@@ -1,9 +1,11 @@
 const { widget } = figma;
 const { AutoLayout, useSyncedState } = widget;
 
-import { TokenRecords } from "./common/token.types";
+import { ComponentUsage, TokenRecords } from "./common/token.types";
 
-import { WidgetHeader } from "./token-list";
+import { WidgetHeader, ComponentDocs } from "./token-list";
+import { getAllLocalVariableTokens } from "./common/variables.utils";
+import { generateLayerFile } from "./common/generator.utils";
 import { isComponent, isInstance } from "./common/figma.types";
 import {
   diffRecordValues,
@@ -13,7 +15,7 @@ import {
   getVariantListByFilter,
   isNotNil,
 } from "./common/component.utils";
-import { VariantsDocs, EmptyComponentDocs } from "./token-list/variants-docs";
+import { VariantsDocs } from "./token-list/variants-docs";
 
 // get the selected node from the figma API and return it
 export const getSelectedNode = async () => {
@@ -222,11 +224,47 @@ export const NodeTokens = ({ document }: NodeTokensProps) => {
   );
 };
 
+type NodeTokensProps = {
+  usage: ComponentUsage | undefined;
+  document: () => void;
+  deleteComponent: (id: string) => void;
+};
+
+export const NodeTokens = ({
+  usage,
+  document,
+}: NodeTokensProps) => {
+  return (
+    <AutoLayout
+      name="WidgetFrame"
+      effect={{
+        type: "drop-shadow",
+        color: "#00000040",
+        offset: {
+          x: 0,
+          y: 4,
+        },
+        blur: 4,
+        showShadowBehindNode: false,
+      }}
+      fill="#F6F6F6"
+      stroke="#858585"
+      cornerRadius={6}
+      direction="vertical"
+      spacing={6}
+      padding={12}
+    >
+      <WidgetHeader loaded={!!usage} addVariants={document} />
+      <ComponentDocs
+        usage={usage}
+      />
+    </AutoLayout>
+  );
+};
+
 export type VariantTokensProps = {
   name: string;
   tokens: TokenRecords;
-  lastLoaded?: string;
-  resetComponets: () => void;
 };
 
 export const VariantTokens: FunctionalWidget<VariantTokensProps> = ({
@@ -255,12 +293,7 @@ export const VariantTokens: FunctionalWidget<VariantTokensProps> = ({
       spacing={6}
       padding={12}
     >
-      <WidgetHeader
-        loaded={true}
-        lastLoaded={lastLoaded}
-        addVariants={() => {}}
-        resetComponents={resetComponets}
-      />
+      <WidgetHeader loaded={true} addVariants={() => {}} />
       <VariantsDocs name={name} tokenList={tokens} />
     </AutoLayout>
   );
@@ -285,47 +318,58 @@ const documentVariants =
   };
 
 export function Widget() {
-  const [node, setNode] = useSyncedState<ComponentNode | null>("nodes", null);
-  const [lastLoaded, setLastLoaded] = useSyncedState<string | null>(
-    "lastLoaded",
-    null
+  const [node, setNode] = useSyncedState<ComponentUsage | undefined>(
+    "nodes",
+    undefined
   );
-  const [variantTokens, setVariantTokens] = useSyncedState<TokenRecords | null>(
-    "componentTokens",
-    null
-  );
+  const [name, setName] = useSyncedState<string>("name", "");
+  const [deleted, setDeleted] = useSyncedState<string[]>("deletedNodes", []);
+  const [variantTokens, setVariantTokens] = useSyncedState<
+    TokenRecords | undefined
+  >("componentTokens", undefined);
 
-  return node && variantTokens ? (
-    <VariantTokens
-      name={node.name}
-      tokens={variantTokens}
-      lastLoaded={lastLoaded ?? undefined}
-      resetComponets={() => {
-        setNode(null);
-        setLastLoaded(null);
-        setVariantTokens(null);
-      }}
-    />
+  return variantTokens ? (
+    <VariantTokens name={name} tokens={variantTokens} />
   ) : (
     <NodeTokens
-      document={() =>
-        getSelectedNode().then((node) => {
-          if (!node || !isComponent(node)) {
-            console.error("No valid component");
-            throw new Error("No valid component selected");
-          }
-          setNode(node);
-          setLastLoaded(strNow());
-          documentVariants(setVariantTokens, node)();
-        })
-      }
+      usage={node}
+      inspect={() => {
+        getAllLocalVariableTokens().then((collections) => {
+          const result = generateLayerFile(collections);
+          console.log("==================>", result);
+        });
+
+        getSelectedNode()
+          .then((node) => {
+            if (!node) throw new Error("No component selected");
+            return getTokensFromNode(node);
+          })
+          .then((usage) => setNode(usage));
+      }}
+      document={() => {
+        console.log("BEFORE SELECT NODE");
+        getSelectedNode()
+          .then((node) => {
+            console.log("after getCurrentNode");
+            if (!node) throw new Error("No component selected");
+            // setName(node.name);
+            return getTokenList(node);
+          })
+          .then((list) => {
+            console.log("PRE", list);
+            return setVariantTokens(list);
+          });
+      }}
+      isDeleted={(id: string) => deleted.indexOf(id) !== -1}
+      deleteComponent={(id: string) => {
+        if (deleted.indexOf(id) === -1) setDeleted([...deleted, id]);
+      }}
+      resetComponents={() => {
+        setNode(undefined);
+        setDeleted([]);
+      }}
     />
   );
 }
 
 widget.register(Widget);
-
-function strNow() {
-  const d = new Date();
-  return `${d.toLocaleDateString()} ${d.toLocaleTimeString()}`;
-}

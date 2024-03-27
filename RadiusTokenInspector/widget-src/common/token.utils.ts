@@ -176,13 +176,13 @@ export type TokenError = {
 type ReturnTuple = [ok: boolean, errs: TokenError[]];
 
 export const validateTokenName = (
-  name: string
-): readonly [
   name: string,
-  ok: boolean,
-  errs: TokenError[],
-  errorsBySegment: Record<string, TokenError[]>
-] => {
+  renderName: (
+    printableName: string,
+    errorsBySegment: Record<string, TokenError[]>,
+    ok: boolean
+  ) => FigmaDeclarativeNode
+): readonly [node: FigmaDeclarativeNode, ok: boolean, errs: TokenError[]] => {
   const printableName = name.replaceAll("/", ".");
   // TODO: inject this boolean from the UI
   const rules = v3Tokens ? v3TokenRules : tokenRules;
@@ -220,7 +220,8 @@ export const validateTokenName = (
     };
   }, {} as Record<string, TokenError[]>);
 
-  return [printableName, ok, errs, errorsBySegment] as const;
+  const renderedName = renderName(printableName, errorsBySegment, ok);
+  return [renderedName, ok, errs] as const;
 };
 
 export const calculateSubjectsFromProps = (componentProps: string[]) =>
