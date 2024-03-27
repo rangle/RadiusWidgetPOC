@@ -103,7 +103,7 @@ function renderName(
 }
 
 export const PropValue: FunctionalWidget<PropValueType> = ({ type, value }) => {
-  const [renderedName, valid, errors] = validateTokenName(value, renderName);
+  const [name, valid, errors, errorsBySegment] = validateTokenName(value);
   return (
     <>
       <AutoLayout
@@ -136,7 +136,7 @@ export const PropValue: FunctionalWidget<PropValueType> = ({ type, value }) => {
           padding={4}
           verticalAlignItems="center"
         >
-          {renderedName}
+          {renderName(name, errorsBySegment, valid)}
         </AutoLayout>
       </AutoLayout>
     </>

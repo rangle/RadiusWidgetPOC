@@ -80,8 +80,8 @@ export const VariantsDocs: FunctionalWidget<VariantsDocsProps> = ({
         left: 0,
       }}
     >
-      {items.map(({ name, subjects, attribute, tokens }, idx) => (
-        <AutoLayout key={idx} width="fill-parent">
+      {items.map(({ name, subjects, attribute, tokens }) => (
+        <>
           <AutoLayout
             name="Component-Header"
             stroke={"#aaa"}
@@ -152,37 +152,32 @@ export const VariantsDocs: FunctionalWidget<VariantsDocsProps> = ({
               <></>
             )}
           </AutoLayout>
-          {tokens.length > 0 ? (
-            <AutoLayout
-              name="Component-Content"
-              stroke={"#aaa"}
-              strokeWidth={1}
-              overflow="visible"
-              direction="vertical"
-              spacing={6}
-              padding={{
-                top: 6,
-                right: 0,
-                bottom: 0,
-                left: 4,
-              }}
-              strokeDashPattern={[2, 2]}
-            >
-              {tokens.map(([key, value], idx) => (
-                <PropDocs
-                  key={idx}
-                  prop={{
-                    name: key,
-                    value: value,
-                    from: "variable",
-                  }}
-                />
-              ))}
-            </AutoLayout>
-          ) : (
-            <Text>== default</Text>
-          )}
-        </AutoLayout>
+          <AutoLayout
+            name="Component-Content"
+            stroke={"#aaa"}
+            strokeWidth={1}
+            overflow="visible"
+            direction="vertical"
+            spacing={6}
+            padding={{
+              top: 6,
+              right: 0,
+              bottom: 0,
+              left: 4,
+            }}
+            strokeDashPattern={[2, 2]}
+          >
+            {tokens.map(([key, value]) => (
+              <PropDocs
+                prop={{
+                  name: key,
+                  value: value,
+                  from: "variable",
+                }}
+              />
+            ))}
+          </AutoLayout>
+        </>
       ))}
     </AutoLayout>
   );
