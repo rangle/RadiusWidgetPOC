@@ -96,9 +96,7 @@ function renderName(
 }
 
 export const PropValue: FunctionalWidget<PropValueType> = ({ type, value }) => {
-  console.log("Validating token Name");
   const [name, valid, errors, errorsBySegment] = validateTokenName(value);
-  console.log("valid", type, value, valid, errors);
   return (
     <AutoLayout
       name="PropValue"
@@ -130,7 +128,24 @@ export const PropValue: FunctionalWidget<PropValueType> = ({ type, value }) => {
         padding={4}
         verticalAlignItems="center"
       >
-        {valid ? name : renderName(name, errorsBySegment, valid)}
+        <Icon16px icon={type === "variable" ? "variables" : "tokens"} />
+
+        <AutoLayout
+          name="PropertyValue"
+          fill="#D3E6FF"
+          cornerRadius={{
+            topLeft: 0,
+            topRight: 6,
+            bottomRight: 6,
+            bottomLeft: 0,
+          }}
+          overflow="visible"
+          spacing={0}
+          padding={4}
+          verticalAlignItems="center"
+        >
+          {renderName(name, errorsBySegment, valid)}
+        </AutoLayout>
       </AutoLayout>
     </AutoLayout>
   );
