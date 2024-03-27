@@ -80,8 +80,8 @@ export const VariantsDocs: FunctionalWidget<VariantsDocsProps> = ({
         left: 0,
       }}
     >
-      {items.map(({ name, subjects, attribute, tokens }, idx) => (
-        <AutoLayout key={idx} width="fill-parent">
+      {items.map(({ name, subjects, attribute, tokens }) => (
+        <>
           <AutoLayout
             name="Component-Header"
             stroke={"#aaa"}
@@ -149,7 +149,11 @@ export const VariantsDocs: FunctionalWidget<VariantsDocsProps> = ({
                 </AutoLayout>
               </AutoLayout>
             ) : (
-              <></>
+              <AutoLayout
+                name="subject-group"
+                spacing={6}
+                verticalAlignItems="center"
+              ></AutoLayout>
             )}
           </AutoLayout>
           {tokens.length > 0 ? (
@@ -168,9 +172,8 @@ export const VariantsDocs: FunctionalWidget<VariantsDocsProps> = ({
               }}
               strokeDashPattern={[2, 2]}
             >
-              {tokens.map(([key, value], idx) => (
+              {tokens.map(([key, value]) => (
                 <PropDocs
-                  key={idx}
                   prop={{
                     name: key,
                     value: value,
@@ -180,9 +183,16 @@ export const VariantsDocs: FunctionalWidget<VariantsDocsProps> = ({
               ))}
             </AutoLayout>
           ) : (
-            <Text>== default</Text>
+            <AutoLayout
+              name="default-values"
+              spacing={6}
+              padding={6}
+              verticalAlignItems="center"
+            >
+              <Text fontSize={12}>Same properties as default</Text>
+            </AutoLayout>
           )}
-        </AutoLayout>
+        </>
       ))}
     </AutoLayout>
   );

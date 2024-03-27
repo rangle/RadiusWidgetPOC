@@ -10,6 +10,8 @@ const { Text, AutoLayout } = widget;
 export type ComponentDocsProps = {
   usage: ComponentUsage | undefined;
   isChildren?: boolean;
+  isDeleted: (id: string) => boolean;
+  deleteComponent: (id: string) => void;
 };
 
 export const EmptyComponentDocs = () => (
@@ -53,7 +55,9 @@ export const EmptyComponentDocs = () => (
 
 export const ComponentDocs: FunctionalWidget<ComponentDocsProps> = ({
   usage,
+  deleteComponent,
   isChildren,
+  isDeleted,
 }) => {
   if (!usage) return <EmptyComponentDocs />;
   const { id, name, props, children } = usage;
@@ -62,7 +66,7 @@ export const ComponentDocs: FunctionalWidget<ComponentDocsProps> = ({
     ? ["instance", 14]
     : ["component", 20];
 
-  const childrenToRender = children;
+  const childrenToRender = children.filter(({ id }) => !isDeleted(id));
   return (
     <AutoLayout
       name="Component-Frame"
@@ -157,8 +161,8 @@ export const ComponentDocs: FunctionalWidget<ComponentDocsProps> = ({
         }}
         strokeDashPattern={[2, 2]}
       >
-        {props.map((prop, index) => (
-          <PropDocs key={index} prop={prop} />
+        {props.map((prop) => (
+          <PropDocs prop={prop} />
         ))}
 
         {childrenToRender.length > 0 && (
