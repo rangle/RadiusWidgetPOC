@@ -14,6 +14,7 @@ import {
   isNotNil,
 } from "./common/component.utils";
 import { VariantsDocs } from "./token-list/variants-docs";
+import { BottomLogo } from "./token-list/bottom-logo";
 
 // get the selected node from the figma API and return it
 export const getSelectedNode = async () => {
@@ -132,6 +133,9 @@ export const NodeTokens = ({ document }: NodeTokensProps) => {
     >
       <WidgetHeader loaded={false} addVariants={document} />
       <EmptyComponentDocs />
+      <AutoLayout direction="horizontal">
+        <BottomLogo />
+      </AutoLayout>
     </AutoLayout>
   );
 };
@@ -176,6 +180,9 @@ export const VariantTokens: FunctionalWidget<VariantTokensProps> = ({
         resetComponents={resetComponets}
       />
       <VariantsDocs name={name} tokenList={tokens} />
+      <AutoLayout direction="horizontal">
+        <BottomLogo />
+      </AutoLayout>
     </AutoLayout>
   );
 };
