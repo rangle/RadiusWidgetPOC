@@ -1,0 +1,16 @@
+{
+  "name": "Radius Token Synchronizer",
+  "id": "000",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "ui": "./dist/index.html",
+  "capabilities": [],
+  "enableProposedApi": false,
+  "editorType": ["figma"],
+  "containsWidget": true,
+  "widgetApi": "1.0.0",
+  "networkAccess": {
+    "allowedDomains": ["https://github.com"]
+  },
+  "documentAccess": "dynamic-page"
+}
