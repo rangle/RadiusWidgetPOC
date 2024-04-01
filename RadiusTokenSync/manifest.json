@@ -10,7 +10,9 @@
   "containsWidget": true,
   "widgetApi": "1.0.0",
   "networkAccess": {
-    "allowedDomains": ["https://github.com"]
+    "allowedDomains": ["*"],
+    "reasoning": "because so",
+    "devAllowedDomains": []
   },
   "documentAccess": "dynamic-page"
 }

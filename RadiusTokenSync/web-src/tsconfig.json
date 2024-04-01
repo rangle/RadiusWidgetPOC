@@ -74,5 +74,5 @@
       "react-dom": ["../node_modules/preact/compat/"]
     }
   },
-  "include": ["./**/*.tsx", "./**/*.ts", "../vite.config.ts"]
+  "include": ["./**/*.tsx", "./**/*.ts", "../types", "../vite.config.ts"]
 }

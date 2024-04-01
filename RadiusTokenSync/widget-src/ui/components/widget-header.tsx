@@ -5,32 +5,17 @@ import { NameFormat } from "./name-format";
 const { widget } = figma;
 const { Text, AutoLayout } = widget;
 
-export type WidgetHeaderProps = {
-  loaded: boolean;
-  lastLoaded?: string;
-  remoteVersion?: string;
-  openConfig: () => void;
-  synchronize?: () => void;
-};
+export type WidgetHeaderProps = BaseProps & HasChildrenProps;
 
-export const WidgetHeader = ({
-  loaded,
-  lastLoaded,
-  remoteVersion,
-  openConfig,
-  synchronize,
-}: WidgetHeaderProps) => {
+export const WidgetHeader = ({ children, ...props }: WidgetHeaderProps) => {
   return (
     <AutoLayout
       name="Widget-Header"
       overflow="visible"
       spacing="auto"
-      padding={{
-        vertical: 6,
-        horizontal: 3,
-      }}
       width="fill-parent"
       direction="vertical"
+      {...props}
     >
       <AutoLayout
         spacing="auto"
@@ -38,7 +23,7 @@ export const WidgetHeader = ({
           vertical: 6,
           horizontal: 3,
         }}
-        width="hug-contents"
+        width="fill-parent"
         direction="horizontal"
       >
         <AutoLayout
@@ -57,36 +42,7 @@ export const WidgetHeader = ({
             Radius Token Synchronizer
           </Text>
         </AutoLayout>
-        {loaded ? (
-          <>
-            {synchronize && (
-              <Button icon="close" onClick={() => synchronize()}>
-                Reset
-              </Button>
-            )}
-          </>
-        ) : (
-          <Button icon="github" onClick={() => openConfig()}>
-            Configure
-          </Button>
-        )}
-      </AutoLayout>
-      <AutoLayout direction="horizontal" width="fill-parent" spacing="auto">
-        <NameFormat />
-        {remoteVersion && (
-          <>
-            <Text fontSize={10}>Remote version</Text>
-            <Text fontWeight={900}>{remoteVersion}</Text>
-          </>
-        )}
-      </AutoLayout>
-      <AutoLayout direction="horizontal" width="fill-parent" spacing="auto">
-        {lastLoaded && (
-          <>
-            <Text fontSize={10}>Last Synched</Text>
-            <Text fontWeight={300}>{lastLoaded}</Text>
-          </>
-        )}
+        <AutoLayout direction="vertical">{children}</AutoLayout>
       </AutoLayout>
     </AutoLayout>
   );

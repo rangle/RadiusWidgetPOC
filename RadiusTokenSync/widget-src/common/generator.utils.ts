@@ -50,7 +50,7 @@ export const color = (c: number) => Math.round(c * 255);
 export const renderRGB = ({ r, g, b }: RGB): string =>
   `rgb(${color(r)}, ${color(g)}, ${color(b)})`;
 export const renderRGBA = ({ r, g, b, a }: RGBA): string =>
-  `rgb(${color(r)}, ${color(g)}, ${color(b)}, ${a.toFixed(2)})`;
+  `rgba(${color(r)}, ${color(g)}, ${color(b)}, ${a.toFixed(2)})`;
 
 export const renderValue = (typeName: string, v: VariableValue): string => {
   const type = tokenTypeNames.find((t) => t === (typeName as TokeTypeName));
@@ -58,6 +58,7 @@ export const renderValue = (typeName: string, v: VariableValue): string => {
     case "color":
     case "textColor":
     case "backgroundColor":
+      // TODO: convert to HSL colors
       if (isRGBA(v)) return renderRGBA(v);
       if (isRGB(v)) return renderRGB(v);
       break;
