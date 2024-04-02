@@ -1,15 +1,10 @@
 const { widget } = figma
 const { AutoLayout, Text } = widget
-import { getAllTokens, getAllLocalVariableTokens } from './tokens'
-import { generateDefaultComponents, createDocumentationPage, createPropertiesGrid, createComponentTokens, createCheckBoxSection, HAND_OFF_SECTIONS } from './rendering'
-
-// get the selected node from the figma API and return it
-const getSelectedNode = async () => {
-  const selectedNode = figma.currentPage.selection[0];
-  if (!selectedNode) return figma.notify('No node selected');
-  const tokens = getAllTokens(selectedNode);
-  console.log('tokens', tokens);
-};
+import { WidgetHeader } from './ui/components/widget-header';
+import { BottomLogo } from './ui/components/bottom-logo';
+import { Button } from './ui/components/button';
+import { Icon16px } from './ui/components/icon';
+import { generateDefaultComponents, createDocumentationPage } from './rendering'
 
 const createComponents = async () => {
   await generateDefaultComponents();
@@ -17,88 +12,51 @@ const createComponents = async () => {
 
 const createDocumentation = async () => {
   const selectedNode = figma.currentPage.selection[0];
-  await createDocumentationPage(selectedNode);
+  // get the centre of the screen to place the documentation
+
+  if (!selectedNode) {
+    figma.notify('Please select a component to generate documentation for');
+    return;
+  }
+  await createDocumentationPage(selectedNode, selectedNode.x + selectedNode.width + 100, selectedNode.y);
 }
 
-const createGrid = async () => {
-  const selectedNode = figma.currentPage.selection[0];
-  if (!selectedNode) return figma.notify('No node selected');
-  await createPropertiesGrid(selectedNode)
-}
-
-const createTokens = async () => {
-  const selectedNode = figma.currentPage.selection[0];
-  if (!selectedNode) return figma.notify('No node selected');
-  await createComponentTokens(selectedNode)
-}
-
-const clickGetTokens = async () => {
-  console.log(await getAllLocalVariableTokens());
-}
-
-const clickCreateCheckBoxSection = async () => {
-  const frames = await createCheckBoxSection(HAND_OFF_SECTIONS);
-  if (!frames) return figma.notify('No frames created');
-
-  const wrapper = await figma.createNodeFromJSXAsync(<AutoLayout
-    direction='vertical'
-    spacing={10}
-  ></AutoLayout>) as FrameNode;
-  frames.forEach(frame => {
-    wrapper.appendChild(frame);
-    frame.layoutSizingHorizontal = 'FILL';
-  })
-
-};
 
 function Widget() {
   return <AutoLayout
-    direction='vertical'
-    spacing={10}
+    name="WidgetFrame"
+    effect={{
+      type: "drop-shadow",
+      color: "#00000040",
+      offset: {
+        x: 0,
+        y: 4,
+      },
+      blur: 4,
+      showShadowBehindNode: false,
+    }}
+    fill="#F6F6F6"
+    stroke="#858585"
+    cornerRadius={6}
+    direction="vertical"
+    spacing={6}
+    padding={6}
   >
-    <AutoLayout
-      onClick={createComponents}
-      padding={20}
-      fill={{ type: 'solid', color: '#fff' }}
-    >
-      <Text>Generate Default Documentation</Text>
+    <WidgetHeader >
+      <AutoLayout
+        verticalAlignItems="center"
+        onClick={createComponents}
+      >
+        <Icon16px icon="gear" size={12} />
+        <Text fontSize={9}>Generate Components</Text>
+      </AutoLayout>
+    </WidgetHeader >
+    <Button icon='radius' onClick={createDocumentation}>Create Documentation</Button>
+
+    <AutoLayout direction="horizontal" padding={16}>
+      <BottomLogo />
     </AutoLayout>
-    <AutoLayout
-      onClick={createDocumentation}
-      padding={20}
-      fill={{ type: 'solid', color: '#fff' }}
-    >
-      <Text>Create Documentation</Text>
-    </AutoLayout>
-    <AutoLayout
-      onClick={createGrid}
-      padding={20}
-      fill={{ type: 'solid', color: '#fff' }}
-    >
-      <Text>Create Grid</Text>
-    </AutoLayout>
-    <AutoLayout
-      onClick={createTokens}
-      padding={20}
-      fill={{ type: 'solid', color: '#fff' }}
-    >
-      <Text>Create Tokens</Text>
-    </AutoLayout>
-    <AutoLayout
-      onClick={clickGetTokens}
-      padding={20}
-      fill={{ type: 'solid', color: '#fff' }}
-    >
-      <Text>Get Tokens</Text>
-    </AutoLayout>
-    <AutoLayout
-      onClick={clickCreateCheckBoxSection}
-      padding={20}
-      fill={{ type: 'solid', color: '#fff' }}
-    >
-      <Text>Create Checkbox Section</Text>
-    </AutoLayout>
-  </AutoLayout>
+  </AutoLayout >
 }
 
 widget.register(Widget)
