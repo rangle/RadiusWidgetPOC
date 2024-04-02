@@ -383,7 +383,7 @@ export type GithubClient = ReturnType<typeof createGithubRepositoryClient>;
 
 /* Example usage */
 
-// const accessToken = "<your access token>";
+// const accessToken = "<your token>";
 // const repoFullName = "rangle/nx-next-shadcn-ui-starter";
 
 // const options: GithubOptions = {

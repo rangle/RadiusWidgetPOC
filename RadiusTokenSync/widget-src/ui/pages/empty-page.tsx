@@ -10,6 +10,7 @@ import { Button } from "../components/button";
 import { Icon16px } from "../components/icon";
 import { RepositoryTokenLayers } from "../../services/load-github.services";
 import { CommitRibbon } from "../components/commit-ribbon";
+import { getTokenLayers } from "../../services/load-tokens.services";
 
 type EmptyPageProps = {
   loaded: boolean;
@@ -129,10 +130,10 @@ export const EmptyPage = ({
           >
             <Button
               icon="refresh"
-              onClick={() => {
+              onClick={async () => {
                 console.log("THIS IS IT!");
-                const url = new URL("http://teste.com/path/to/file?query=234");
-                console.log(url.pathname);
+                const [collections, layers, errors] = await getTokenLayers();
+                console.log(layers);
               }}
             >
               Load tokens and variables
