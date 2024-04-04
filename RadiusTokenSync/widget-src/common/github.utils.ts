@@ -186,7 +186,7 @@ export const createGithubRepositoryClient = ({
       console.error("ERROR WHILE FETCHING", e);
       return e;
     });
-    console.log("<<<<<<<<<< After fetch");
+    console.log("<<<<<<<<<< After fetch", response.status);
     if (!response.ok) {
       console.error(await response.json());
       throw new Error(`HTTP returned code ${response.status}`);
@@ -197,6 +197,7 @@ export const createGithubRepositoryClient = ({
   };
 
   const fetchRawFile = async (url: string, head = false) => {
+    console.log(">>>>> before raw fetch", url);
     const response = await fetch(url, {
       method: head ? "HEAD" : "GET",
       headers: {
@@ -204,6 +205,8 @@ export const createGithubRepositoryClient = ({
         "X-GitHub-Api-Version": "2022-11-28",
       },
     });
+    console.log(">>>>> after raw fetch", response.status);
+    // console.log(JSON.stringify(await response.json()));
     return response;
   };
 
@@ -335,7 +338,7 @@ export const createGithubRepositoryClient = ({
     const url = new URL(originalUrl);
     const protocol = url.protocol;
     const newPathWithFileName = newPath ? `${newPath}/${fileName}` : fileName;
-    return `${protocol}//${url.host}/${newPathWithFileName}`;
+    return `${protocol}//${url.host}/${newPathWithFileName}${url.query}`;
   };
 
   const getFileInPreviousPath = async (
@@ -346,18 +349,17 @@ export const createGithubRepositoryClient = ({
     const file = await getFileDetailsByPath(path);
     if (!file)
       throw new Error(`File or Directory ${file} not found in repository`);
-    const foundLocation = await findInPreviousPath(
-      file.download_url,
-      async (p) => {
-        const searchPath = formatUrl(file.download_url, p, searchFileName);
-        const response = await fetchRawFile(searchPath, true);
-        return response.ok;
-      }
-    );
+    const fileUrl = file.url; // using url instead of download_url to avoid CORS issue
+    console.log("file", file);
+    const foundLocation = await findInPreviousPath(fileUrl, async (p) => {
+      const searchPath = formatUrl(fileUrl, p, searchFileName);
+      console.log("file url >>", searchPath);
+      const response = await fetchRawFile(searchPath, true);
+      return response.ok;
+    });
     return [
       file,
-      foundLocation &&
-        formatUrl(file.download_url, foundLocation, searchFileName),
+      foundLocation && formatUrl(fileUrl, foundLocation, searchFileName),
       foundLocation,
     ] as const;
   };

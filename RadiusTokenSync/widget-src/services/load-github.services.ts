@@ -1,9 +1,11 @@
 import { join } from "path-browserify";
+import { Buffer } from "buffer";
 import {
   GithubOptions,
   createGithubRepositoryClient,
   GithubClient,
   isPackageJSON,
+  isGithubFileDetails,
 } from "../common/github.utils";
 
 /**
@@ -48,9 +50,29 @@ const getPackageJson = async (client: GithubClient, options: GithubOptions) => {
   const packageResponse = await client.fetchRawFile(packageJsonLocation);
   if (!packageResponse.ok)
     throw new Error("Problem occurred while trying to read package.json");
+  console.log(">>", "getPackageJson 3");
+  console.log(await packageResponse.json());
+  console.log(">>", "getPackageJson 4");
+  const packageFileDetails = await packageResponse.json();
+  console.log("PACKAGE.JSON LOADED");
 
-  const packagejson = await packageResponse.json();
-  if (!isPackageJSON(packagejson)) return [undefined, tokenFile] as const;
+  if (!isGithubFileDetails(packageFileDetails)) {
+    console.log("PACKAGE.JSON UNKNOWN FORMAT:", packageFileDetails);
+    return [undefined, tokenFile] as const;
+  }
+
+  const packagejsonStr = Buffer.from(
+    packageFileDetails.content,
+    packageFileDetails.encoding
+  ).toString();
+
+  const packagejson = JSON.parse(packagejsonStr);
+
+  if (!isPackageJSON(packagejson)) {
+    console.log("PACKAGE.JSON NOT THE RIGHT FORMAT");
+    return [undefined, tokenFile] as const;
+  }
+  console.log("SUCCESSFULLY", packagejson.version);
   return [packagejson, tokenFile, packageJsonRelativePath] as const;
 };
 

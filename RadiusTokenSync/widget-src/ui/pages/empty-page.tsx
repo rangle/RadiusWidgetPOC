@@ -1,8 +1,6 @@
 const { widget } = figma;
 const { AutoLayout, Text } = widget;
 
-import URL from "url-parse";
-
 import { WidgetHeader } from "../components/widget-header";
 import { BottomLogo } from "../components/bottom-logo";
 import { NameFormat } from "../components/name-format";
