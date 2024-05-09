@@ -173,6 +173,12 @@ export type TokenError = {
   segments: string[];
 };
 
+export type TokenValidationResult = {
+  collection: string;
+  variable: TokenVariable;
+  errors: TokenError[];
+};
+
 type ReturnTuple = [ok: boolean, errs: TokenError[]];
 
 export const validateTokenName = (

@@ -7,6 +7,7 @@ import {
   isPackageJSON,
   isGithubFileDetails,
 } from "../common/github.utils";
+import { TokenLayers } from "../common/token-parser.types";
 
 /**
  * Formats the relative path of a package.json file based on the provided options and packageJson
@@ -87,24 +88,25 @@ export const fetchRepositoryTokenLayers = async (options: GithubOptions) => {
   console.log("fetchRepositoryTokenLayers 2");
   const [packagejson, tokenFile] = await getPackageJson(client, options);
   console.log("fetchRepositoryTokenLayers 3");
-
   const lastCommitsFromRepo = await client.getLastCommitByPath(tokenFile.path);
+
   console.log("fetchRepositoryTokenLayers 4");
   const lastCommits = lastCommitsFromRepo.map(
     ({
       commit: { author, committer, message },
       sha,
-      author: { avatar_url: autor_avatar_url },
-      committer: { avatar_url: commiter_avatar_url },
+      author: authorDetails,
+      committer: committerDetails,
     }) => ({
       sha,
       message,
       author,
       committer,
-      autor_avatar_url,
-      commiter_avatar_url,
+      autor_avatar_url: authorDetails?.avatar_url,
+      commiter_avatar_url: committerDetails?.avatar_url,
     })
   );
+  console.log("fetchRepositoryTokenLayers 5");
 
   const tokenFileContent = Buffer.from(
     tokenFile.content,
@@ -138,12 +140,15 @@ export type RepositoryTokenLayers = ReturnType<
  * @param options - The GithubOptions object containing the credentials and branch information.
  * @param tokenLayers - The object representing the token layers to be saved.
  * @param message - The commit message.
+ * @param destinationBranch - The destination branch.
+ * @param version - Version to update on package.json
  */
 export const saveRepositoryTokenLayers = async (
   options: GithubOptions,
-  tokenLayers: object,
+  tokenLayers: TokenLayers,
   message: string,
-  destinationBranch?: string
+  destinationBranch?: string,
+  version?: string
 ) => {
   const client = createGithubRepositoryClient(options.credentials);
 
@@ -153,13 +158,7 @@ export const saveRepositoryTokenLayers = async (
   );
 
   const packageVersion = packagejson?.version ?? "0.0.0";
-
-  const [major, minor, build] = packageVersion.split(".").map(Number);
-
-  // increment minor version if above v1.0, or build verson if below
-  const numVersion =
-    major > 0 ? [major, minor + 1, 0] : [major, minor, build + 1];
-
+  console.log("Saving version", packageVersion, "->", version);
   client.createCommit(
     options.branch,
     message,
@@ -179,7 +178,7 @@ export const saveRepositoryTokenLayers = async (
               content: JSON.stringify(
                 {
                   ...packagejson,
-                  version: numVersion.join("."),
+                  version,
                 },
                 undefined,
                 2

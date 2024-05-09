@@ -2,14 +2,18 @@ import { h, Fragment, FunctionalComponent, render } from "preact";
 import { ConfigForm } from "./components/config";
 
 import { useEffect, useState } from "preact/hooks";
-import { emit, on, EventHandler } from "@create-figma-plugin/utilities";
+import { emit, on } from "@create-figma-plugin/utilities";
 
 import "@create-figma-plugin/ui/css/base.css";
 import {
+  CommitMessageConfirmation,
+  ConfirmPushHandler,
+  UiCommitHandler,
   UiStateHandler,
   WidgetConfiguration,
   WidgetStateHandler,
 } from "../types/state";
+import { PushConfirmation } from "./components/push";
 
 const initialState: WidgetConfiguration = {
   name: "",
@@ -19,12 +23,31 @@ const initialState: WidgetConfiguration = {
   path: "",
 };
 
+const initialCommitState: CommitMessageConfirmation = {
+  branchName: "",
+  commitMessage: "",
+};
+
+export type AppRoute = "loading" | "config" | "push";
+
 export const App: FunctionalComponent = () => {
-  const [state, setState] = useState<WidgetConfiguration>(initialState);
+  const [route, setRoute] = useState<AppRoute>("loading");
+  const [config, setConfig] = useState<WidgetConfiguration>(initialState);
+  const [commit, setCommit] =
+    useState<CommitMessageConfirmation>(initialCommitState);
+
+  // establish the initial handers for routing and updates
   useEffect(() => {
     on<WidgetStateHandler>("PLUGIN_STATE_CHANGE", (state) => {
-      console.log("WEB: STATE CHANGE", state);
-      setState(state ?? initialState);
+      console.log("WEB: PLUGIN_STATE_CHANGE", state);
+      setConfig(state ?? initialState);
+      setRoute("config");
+    });
+
+    on<ConfirmPushHandler>("PLUGIN_CONFIRM_PUSH", (state) => {
+      console.log("WEB: PLUGIN_CONFIRM_PUSH", state);
+      setCommit(state ?? initialCommitState);
+      setRoute("push");
     });
   }, []);
 
@@ -33,9 +56,20 @@ export const App: FunctionalComponent = () => {
     emit<UiStateHandler>("UI_STATE_CHANGE", newState);
   };
 
+  const updateCommitState = (newState: CommitMessageConfirmation) => {
+    console.log("SENDING UI_STATE_CHANGE");
+    emit<UiCommitHandler>("UI_COMMIT_CHANGE", newState);
+  };
+
   return (
     <Fragment>
-      <ConfigForm state={state} updateState={updateState} />
+      {route === "config" ? (
+        <ConfigForm state={config} updateState={updateState} />
+      ) : route === "push" ? (
+        <PushConfirmation state={commit} updateState={updateCommitState} />
+      ) : (
+        <div>Loading</div>
+      )}
     </Fragment>
   );
 };

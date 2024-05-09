@@ -1,91 +1,92 @@
 const { widget } = figma;
 
-const { Frame, AutoLayout, SVG } = widget;
+const { Frame, AutoLayout, SVG, Text } = widget;
 
-export function BottomLogo() {
+export const BottomLogo = ({ version }: { version: string }) => {
   return (
     <AutoLayout
       name="BottomLogo"
       strokeWidth={0.349}
       overflow="visible"
-      spacing={11.157}
-      verticalAlignItems="center"
+      spacing={"auto"}
+      minWidth={470}
     >
-      <Frame
-        name="logo-secondary"
-        strokeWidth={0.349}
-        overflow="visible"
-        width={36.608}
-        height={18.478}
-      >
+      <AutoLayout spacing={11.157} verticalAlignItems="center">
         <Frame
-          name=".base/logo-secondary"
-          x={{
-            type: "horizontal-scale",
-            leftOffsetPercent: 0,
-            rightOffsetPercent: 0,
-          }}
-          y={{
-            type: "vertical-scale",
-            topOffsetPercent: 0,
-            bottomOffsetPercent: 0,
-          }}
+          name="logo-secondary"
           strokeWidth={0.349}
           overflow="visible"
           width={36.608}
           height={18.478}
         >
-          <SVG
-            name="Vector_Vector"
-            height={18}
-            width={37}
-            src="<svg width='37' height='19' viewBox='0 0 37 19' fill='none' xmlns='http://www.w3.org/2000/svg'>
+          <Frame
+            name=".base/logo-secondary"
+            x={{
+              type: "horizontal-scale",
+              leftOffsetPercent: 0,
+              rightOffsetPercent: 0,
+            }}
+            y={{
+              type: "vertical-scale",
+              topOffsetPercent: 0,
+              bottomOffsetPercent: 0,
+            }}
+            strokeWidth={0.349}
+            overflow="visible"
+            width={36.608}
+            height={18.478}
+          >
+            <SVG
+              name="Vector_Vector"
+              height={18}
+              width={37}
+              src="<svg width='37' height='19' viewBox='0 0 37 19' fill='none' xmlns='http://www.w3.org/2000/svg'>
   <path d='M3.43848 18.4781H0V0H9.50801C13.2083 0 15.5775 2.24116 15.5775 5.5416C15.5775 8.84205 13.1973 11.0832 9.50801 11.0832H8.71155L16.1012 18.4671H11.4781L4.21296 11.0832H3.41651L3.43848 18.4781ZM9.50617 8.18159C11.0881 8.18159 12.1482 7.12413 12.1482 5.5416C12.1482 3.9609 11.0899 2.90161 9.50617 2.90161H3.43665V8.18159H9.50617Z' fill='#808080'/>
   <path d='M36.6076 0V18.4781H18.1152L36.6076 0Z' fill='#808080'/>
   </svg>
   "
-          />
+            />
+          </Frame>
         </Frame>
-      </Frame>
-      <Frame
-        name="Tagline-2"
-        strokeWidth={0.349}
-        overflow="visible"
-        width={119.236}
-        height={12.525}
-      >
         <Frame
-          name=".base/Tagline-2"
-          x={{
-            type: "horizontal-scale",
-            leftOffsetPercent: 0,
-            rightOffsetPercent: 0,
-          }}
-          y={{
-            type: "vertical-scale",
-            topOffsetPercent: 0,
-            bottomOffsetPercent: 0,
-          }}
-          strokeWidth={0.501}
+          name="Tagline-2"
+          strokeWidth={0.349}
           overflow="visible"
           width={119.236}
           height={12.525}
         >
-          <SVG
-            name="Making things that m"
+          <Frame
+            name=".base/Tagline-2"
             x={{
               type: "horizontal-scale",
-              leftOffsetPercent: 0.585,
-              rightOffsetPercent: 0.852,
+              leftOffsetPercent: 0,
+              rightOffsetPercent: 0,
             }}
             y={{
               type: "vertical-scale",
-              topOffsetPercent: 12,
-              bottomOffsetPercent: 11.359,
+              topOffsetPercent: 0,
+              bottomOffsetPercent: 0,
             }}
-            height={10}
-            width={118}
-            src="<svg width='118' height='11' viewBox='0 0 118 11' fill='none' xmlns='http://www.w3.org/2000/svg'>
+            strokeWidth={0.501}
+            overflow="visible"
+            width={119.236}
+            height={12.525}
+          >
+            <SVG
+              name="Making things that m"
+              x={{
+                type: "horizontal-scale",
+                leftOffsetPercent: 0.585,
+                rightOffsetPercent: 0.852,
+              }}
+              y={{
+                type: "vertical-scale",
+                topOffsetPercent: 12,
+                bottomOffsetPercent: 11.359,
+              }}
+              height={10}
+              width={118}
+              src="<svg width='118' height='11' viewBox='0 0 118 11' fill='none' xmlns='http://www.w3.org/2000/svg'>
   <path d='M2.37929 0.871075L4.20908 6.03755L6.02909 0.871075H7.95673V7.99455H6.48409V6.04734L6.63087 2.68619L4.70811 7.99455H3.70026L1.7824 2.69108L1.92918 6.04734V7.99455H0.461426V0.871075H2.37929Z' fill='#808080'/>
   <path d='M12.2132 7.99455C12.148 7.86735 12.1007 7.70916 12.0713 7.51998C11.7288 7.9016 11.2836 8.0924 10.7357 8.0924C10.2171 8.0924 9.78653 7.94237 9.44405 7.64229C9.10484 7.34222 8.93523 6.96387 8.93523 6.50723C8.93523 5.94623 9.14235 5.51569 9.55658 5.21561C9.97407 4.91554 10.5759 4.76387 11.3619 4.76061H12.0126V4.45728C12.0126 4.21265 11.949 4.01695 11.8218 3.87018C11.6979 3.7234 11.5005 3.65001 11.2298 3.65001C10.9917 3.65001 10.8042 3.70709 10.6672 3.82125C10.5334 3.93541 10.4666 4.09197 10.4666 4.29093H9.05265C9.05265 3.98433 9.14724 3.70057 9.33642 3.43964C9.52559 3.1787 9.79305 2.97485 10.1388 2.82807C10.4845 2.67804 10.8727 2.60302 11.3032 2.60302C11.9555 2.60302 12.4725 2.76773 12.8541 3.09716C13.239 3.42333 13.4314 3.88322 13.4314 4.47685V6.77143C13.4347 7.27372 13.5048 7.65371 13.6418 7.91138V7.99455H12.2132ZM11.0439 7.01116C11.2526 7.01116 11.4451 6.9655 11.6212 6.87417C11.7973 6.77958 11.9278 6.65401 12.0126 6.49745V5.58744H11.4842C10.7764 5.58744 10.3997 5.83207 10.3541 6.32132L10.3492 6.40449C10.3492 6.58062 10.4111 6.72576 10.5351 6.83992C10.659 6.95408 10.8286 7.01116 11.0439 7.01116Z' fill='#808080'/>
   <path d='M16.4403 5.87121L15.9315 6.38003V7.99455H14.5176V0.479675H15.9315V4.64319L16.2055 4.29093L17.5607 2.70087H19.2584L17.3454 4.90739L19.4247 7.99455H17.8004L16.4403 5.87121Z' fill='#808080'/>
@@ -111,9 +112,11 @@ export function BottomLogo() {
   <path d='M116.384 7.29982C116.384 7.07476 116.459 6.89211 116.609 6.75186C116.763 6.61161 116.953 6.54148 117.182 6.54148C117.413 6.54148 117.604 6.61161 117.754 6.75186C117.907 6.89211 117.984 7.07476 117.984 7.29982C117.984 7.52161 117.909 7.70263 117.759 7.84289C117.609 7.97988 117.417 8.04837 117.182 8.04837C116.95 8.04837 116.759 7.97988 116.609 7.84289C116.459 7.70263 116.384 7.52161 116.384 7.29982Z' fill='#808080'/>
   </svg>
   "
-          />
+            />
+          </Frame>
         </Frame>
-      </Frame>
+      </AutoLayout>
+      <Text fill="#808080">{`v${version}`}</Text>
     </AutoLayout>
   );
-}
+};

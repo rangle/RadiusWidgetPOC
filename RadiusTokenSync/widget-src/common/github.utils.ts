@@ -106,9 +106,7 @@ export const isCommitDetails = (u: unknown): u is CommitDetails =>
   "url" in u &&
   typeof u["url"] === "string" &&
   "author" in u &&
-  isUserDetails(u["author"]) &&
-  "committer" in u &&
-  isUserDetails(u["committer"]);
+  "committer" in u;
 
 export const isCommitDetailsArray = (u: unknown): u is Array<CommitDetails> => {
   return Array.isArray(u) && u.every((item) => isCommitDetails(item));
@@ -183,6 +181,7 @@ export const createGithubRepositoryClient = ({
         ...(body && { body: JSON.stringify(body) }),
       }
     ).catch((e) => {
+      console.log(">>>", e);
       console.error("ERROR WHILE FETCHING", e);
       return e;
     });
@@ -325,6 +324,7 @@ export const createGithubRepositoryClient = ({
 
   const getFileDetailsByPath = async (path: string) => {
     const result = await command(`contents/${path}`, undefined, "GET");
+    console.log("getFileDetailsByPath", result);
     if (!(typeof result === "object" && isGithubFileDetails(result)))
       throw new Error(`Could not obtain contents of file ${path}`);
     return result;
@@ -345,6 +345,7 @@ export const createGithubRepositoryClient = ({
     path: string,
     searchFileName: string
   ) => {
+    console.log("getFileInPreviousPath");
     // obtain the original file or directory
     const file = await getFileDetailsByPath(path);
     if (!file)
@@ -366,6 +367,7 @@ export const createGithubRepositoryClient = ({
 
   const getLastCommitByPath = async (path: string) => {
     const result = await command(`commits?path=${path}`, undefined, "GET");
+    console.log(">>>", result, isCommitDetailsArray(result));
     if (!isCommitDetailsArray(result))
       throw new Error(`Could not obtain last commits for file ${path}`);
     return result;
@@ -385,7 +387,7 @@ export type GithubClient = ReturnType<typeof createGithubRepositoryClient>;
 
 /* Example usage */
 
-// const accessToken = "<your token>";
+// const accessToken = "<token here>";
 // const repoFullName = "rangle/nx-next-shadcn-ui-starter";
 
 // const options: GithubOptions = {
@@ -426,3 +428,16 @@ export type GithubClient = ReturnType<typeof createGithubRepositoryClient>;
 //   .then(([tokenFile, packagejson]) => {
 //     console.log(tokenFile, packagejson);
 //   });
+
+// client.createCommit(
+//   "main",
+//   "new changes from the test script",
+//   [
+//     {
+//       path: "token/test.json",
+//       content: `{ "type": "test", "value": 100 }`,
+//       encoding: "utf-8",
+//     },
+//   ],
+//   "design/new1"
+// );

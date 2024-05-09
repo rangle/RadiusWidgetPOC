@@ -131,3 +131,11 @@ export const generateLayerFile = (
     order,
   };
 };
+
+export const isTokenLayer = (l: unknown): l is TokenLayer => (
+  !!l && typeof l === "object" && 'name' in l && 'variables' in l
+)
+
+export const isTokenLayers = (u: unknown): u is TokenLayers => (
+  !!u && typeof u === "object" && 'order' in u && 'layers' in u && Array.isArray(u.layers) && u.layers.every(isTokenLayer)
+)

@@ -1,6 +1,6 @@
 {
-  "name": "Radius Token Synchronizer",
-  "id": "000",
+  "name": "Radius Token Tango",
+  "id": "1369795501141152085",
   "api": "1.0.0",
   "main": "dist/code.js",
   "ui": "./dist/index.html",
@@ -11,7 +11,7 @@
   "widgetApi": "1.0.0",
   "networkAccess": {
     "allowedDomains": ["*"],
-    "reasoning": "because so",
+    "reasoning": "Fetch and save token files in Github",
     "devAllowedDomains": []
   },
   "documentAccess": "dynamic-page"

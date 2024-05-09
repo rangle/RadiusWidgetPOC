@@ -11,31 +11,27 @@ export const Button: FunctionalWidget<ButtonProps> = ({
   ...props
 }) => (
   <AutoLayout
-    name="button"
-    fill="#262626"
+    name="Button"
+    cornerRadius={4}
     overflow="visible"
+    spacing={4}
     padding={{
       vertical: 4,
-      horizontal: 6,
+      horizontal: 8,
     }}
-    horizontalAlignItems="center"
     verticalAlignItems="center"
     {...props}
   >
-    <AutoLayout name="label" spacing={8}>
-      <Text
-        name="Button Label"
-        fill="#fff"
-        verticalAlignText="center"
-        horizontalAlignText="center"
-        lineHeight="150%"
-        fontFamily="Roboto Condensed"
-        fontSize={12}
-        fontWeight={500}
-      >
-        {children}
-      </Text>
-      <Icon16px icon={icon} color="#fff" />
-    </AutoLayout>
+    <Text
+      name="Label"
+      fill="#DADADA"
+      lineHeight="140%"
+      fontFamily="Inter"
+      fontSize={13}
+      letterSpacing={0.24}
+    >
+      {children}
+    </Text>
+    <Icon16px icon={icon} color="#ffffff" />
   </AutoLayout>
 );
