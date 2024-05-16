@@ -166,7 +166,8 @@ export const createGithubRepositoryClient = ({
     method = "POST"
   ) => {
     console.log(
-      "Before fetch",
+      ">>> Before fetch",
+      method,
       `https://api.github.com/repos/${repoFullName}/${partialUrl}`
     );
     const response = await fetch(
@@ -178,7 +179,7 @@ export const createGithubRepositoryClient = ({
           Authorization: `Bearer ${accessToken}`,
           "X-GitHub-Api-Version": "2022-11-28",
         },
-        ...(body && { body: JSON.stringify(body) }),
+        ...(body ? { body: JSON.stringify(body) } : {}),
       }
     ).catch((e) => {
       console.log(">>>", e);
@@ -191,7 +192,7 @@ export const createGithubRepositoryClient = ({
       throw new Error(`HTTP returned code ${response.status}`);
     }
     const res = await response.json();
-    console.log(">>>>RES", res);
+    console.log(">>> RES", res);
     return res;
   };
 
@@ -235,11 +236,21 @@ export const createGithubRepositoryClient = ({
   };
 
   const getParentSha = async (branchName: string) => {
+    console.log("getParentSha", branchName);
     const result = await command(
       `git/refs/heads/${branchName}`,
       undefined,
       "GET"
-    );
+    )
+      .then((res) => {
+        console.log("getParentSha yeah!");
+        return res;
+      })
+      .catch((e) => {
+        console.log("getParentSha ERROR!", e);
+        throw new Error(e);
+      });
+    console.log(">> getParentSha fetched!");
 
     if (
       !(
@@ -287,6 +298,7 @@ export const createGithubRepositoryClient = ({
     files: GithubFile[],
     newBranchName?: string
   ) => {
+    console.log("Create Commit from", branchName);
     const parentSha = await getParentSha(branchName);
     let branch = branchName;
     if (newBranchName) {
@@ -295,9 +307,13 @@ export const createGithubRepositoryClient = ({
         sha: parentSha,
       };
       branch = newBranchName;
+      console.log("Create Commit on", branch);
       await command("git/refs", payload, "POST");
+      console.log("Branch", branch, "created");
     }
+    console.log("creating tree");
     const tree = await createGithubRepoTree(branch, files);
+    console.log("tree created");
 
     const payload = {
       message,
@@ -305,6 +321,7 @@ export const createGithubRepositoryClient = ({
       parents: [parentSha],
     };
 
+    console.log("pushing commit");
     const commitResult = await command("git/commits", payload, "POST");
     if (!isObjectWithSHA(commitResult))
       throw new Error(`Could not obtain SHA of the commit`);

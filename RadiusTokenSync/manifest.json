@@ -5,12 +5,13 @@
   "main": "dist/code.js",
   "ui": "./dist/index.html",
   "capabilities": [],
+  "permissions": ["currentuser"],
   "enableProposedApi": false,
   "editorType": ["figma"],
   "containsWidget": true,
   "widgetApi": "1.0.0",
   "networkAccess": {
-    "allowedDomains": ["*"],
+    "allowedDomains": ["https://*.github.com", "https://*.githubusercontent.com" ],
     "reasoning": "Fetch and save token files in Github",
     "devAllowedDomains": []
   },

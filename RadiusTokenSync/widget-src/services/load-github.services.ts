@@ -86,7 +86,10 @@ export const fetchRepositoryTokenLayers = async (options: GithubOptions) => {
   console.log("fetchRepositoryTokenLayers 1");
   const client = createGithubRepositoryClient(options.credentials);
   console.log("fetchRepositoryTokenLayers 2");
-  const [packagejson, tokenFile] = await getPackageJson(client, options);
+  const [packagejson, tokenFile, packageJsonPath] = await getPackageJson(
+    client,
+    options
+  );
   console.log("fetchRepositoryTokenLayers 3");
   const lastCommitsFromRepo = await client.getLastCommitByPath(tokenFile.path);
 
@@ -122,6 +125,7 @@ export const fetchRepositoryTokenLayers = async (options: GithubOptions) => {
     name,
     version,
     lastCommits,
+    packageJsonPath,
   };
 
   // TODO: add proper typeguard of file
@@ -145,21 +149,18 @@ export type RepositoryTokenLayers = ReturnType<
  */
 export const saveRepositoryTokenLayers = async (
   options: GithubOptions,
-  tokenLayers: TokenLayers,
+  synchData: RepositoryTokenLayers,
   message: string,
   destinationBranch?: string,
   version?: string
 ) => {
   const client = createGithubRepositoryClient(options.credentials);
 
-  const [packagejson, _, packageJsonPath] = await getPackageJson(
-    client,
-    options
-  );
+  const [tokenLayers, packagejson, { packageJsonPath }] = synchData;
 
   const packageVersion = packagejson?.version ?? "0.0.0";
   console.log("Saving version", packageVersion, "->", version);
-  client.createCommit(
+  return await client.createCommit(
     options.branch,
     message,
     [
@@ -174,7 +175,10 @@ export const saveRepositoryTokenLayers = async (
         ? [
             {
               encoding: "utf-8",
-              path: packageJsonPath,
+              path: packageJsonPath.replace(
+                `repos/${options.credentials.repoFullName}/contents`,
+                ""
+              ),
               content: JSON.stringify(
                 {
                   ...packagejson,

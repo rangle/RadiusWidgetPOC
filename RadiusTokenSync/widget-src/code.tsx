@@ -118,25 +118,19 @@ export function Widget() {
           synchDetails={synchDetails}
           reloadTokens={async () => {
             console.log(">>> RELOADING ALL VARIABLES");
-            const [collections, tokenLayers, errors] = await getTokenLayers(
-              true
+            waitForTask(
+              Promise.all([
+                doSynchronize(updateStatus),
+                loadVariables(setAllTokens),
+              ])
             );
-            console.log(collections);
-            console.log(tokenLayers);
-            console.log(errors);
-            setAllTokens({
-              collections,
-              tokenLayers,
-              errors,
-              inspectedAt: strNow(),
-            });
           }}
           pushTokens={pushTokens((edits) => {
-            const { tokenLayers } = allTokens;
             console.log("PUSHING TO THE REPOSITORY", edits);
+            console.log(synchDetails);
             waitForTask(
-              new Promise<void>((resolve) => {
-                resolve(doSaveTokens(tokenLayers ?? null, edits));
+              doSaveTokens(synchDetails ?? null, edits, () => {
+                console.log("FINISHED!!");
               })
             );
             console.log("FINISHED PUSHING TO THE REPOSITORY");
@@ -169,8 +163,9 @@ function saveTokensToRepository(
   setErrorMessage: (newValue: string | null) => void
 ) {
   return async (
-    tokenLayers: TokenLayers | null,
-    { branchName, commitMessage, version }: CommitMessageConfirmation
+    synchDetails: RepositoryTokenLayers | null,
+    { branchName, commitMessage, version }: CommitMessageConfirmation,
+    done: () => void
   ) => {
     console.log("saving tokens...");
     if (!isValidConfiguration(synchConfiguration)) {
@@ -179,9 +174,9 @@ function saveTokensToRepository(
       return;
     }
 
-    if (tokenLayers === null) {
-      console.warn("Invalid Token Layers");
-      setErrorMessage("Invalid Token Layers");
+    if (synchDetails === null) {
+      console.warn("Invalid Loaded Data");
+      setErrorMessage("Invalid Loaded Data");
       return;
     }
 
@@ -194,11 +189,16 @@ function saveTokensToRepository(
         branch: synchConfiguration.branch,
         tokenFilePath: synchConfiguration.path,
       },
-      tokenLayers,
+      synchDetails,
       commitMessage,
       branchName,
       version
-    );
+    )
+      .then(done)
+      .catch((e) => {
+        console.log("WHAT??", e);
+        throw new Error(e);
+      });
   };
 }
 

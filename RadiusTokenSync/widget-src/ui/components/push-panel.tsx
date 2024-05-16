@@ -46,13 +46,6 @@ export const PushPanel: FunctionalWidget<PushPanelProps> = ({
 
   const canPush = ignoreIssues || addedErrs.length + modifiedErrs.length === 0;
 
-  const [branchName, commitMessage] = createCommitDetails(
-    newVersion,
-    deleted,
-    added,
-    modified
-  );
-
   return (
     <AutoLayout
       name="TokePublishPage"
@@ -216,7 +209,16 @@ export const PushPanel: FunctionalWidget<PushPanelProps> = ({
             variant={canPush ? "default" : "disabled"}
             onClick={
               canPush
-                ? () => pushTokens(branchName, commitMessage, newVersion)
+                ? () =>
+                    pushTokens(
+                      ...createCommitDetails(
+                        newVersion,
+                        deleted,
+                        added,
+                        modified,
+                        manuallyBump
+                      )
+                    )
                 : undefined
             }
           >
@@ -232,17 +234,27 @@ function createCommitDetails(
   newVersion: string,
   deleted: string[],
   added: string[],
-  modified: string[]
-): [string, string] {
+  modified: string[],
+  forceBreaking: boolean = false
+): [string, string, string] {
+  const breaking = forceBreaking || deleted.length > 0;
   return [
     `design/${newVersion}`,
-    `${deleted.length > 0 ? "changes (breaking)" : "changes/additions"}
-${added.length > 0 ? "adds:" : ""}
+    `${
+      breaking ? "feat(design-tokens)" : "fix(design-tokens)"
+    }: Changes to Design Tokens
+
+${added.length > 0 ? "Added tokens:" : ""}
 ${added.map((t) => "+ " + t).join("\n")}
-${deleted.length > 0 ? "deletes:" : ""}
+
+${deleted.length > 0 ? "Deleted tokens:" : ""}
 ${deleted.map((t) => "- " + t).join("\n")}
-${modified.length > 0 ? "modifies:" : ""}
+
+${modified.length > 0 ? "Modified tokens:" : ""}
 ${modified.map((t) => ". " + t).join("\n")}
+
+# Figma User: ${figma.currentUser?.name}
   `,
+    newVersion,
   ];
 }

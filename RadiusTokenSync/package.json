@@ -1,6 +1,6 @@
 {
   "name": "@rangle/radius-figma-sync",
-  "version": "0.3.2-alpha",
+  "version": "0.3.3",
   "description": "Radius Figma Synchronizer",
   "type": "module",
   "scripts": {
